@@ -14,3 +14,5 @@ const allMeta = async (file: string) => {
 // This is a bit wonky but it seems to work....
 export const getPostMetadata = async (fileList: string[]) =>
   Promise.all(fileList.map(async (post: string) => allMeta(post)));
+
+export const getAllFiles: (path: string) => Promise<string[]> = async (path) => fs.readdir(`./${path}`);
