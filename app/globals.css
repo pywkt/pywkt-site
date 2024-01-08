@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    a {
+      transition: color 200ms;
+      &:hover {
+        color: darkgrey;
+        transition: color 200ms;
+      }
+    }
+
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+    }
+  }
+}
+
+
 /* :root { */
 /*   --foreground-rgb: 0, 0, 0; */
 /*   --background-start-rgb: 214, 219, 220; */

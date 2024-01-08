@@ -1,3 +1,5 @@
+import PostDate from '../PostDate';
+
 export default function PostPage({
   content,
   data,
@@ -6,9 +8,10 @@ export default function PostPage({
   data: any;
 }) {
   return (
-    <div className=''>
-      <h1>{data.title}</h1>
-      {content}
-    </div>
+    <section className=''>
+      <h1 className='text-3xl'>{data.title}</h1>
+      <PostDate date={data.date} />
+      <article className="mt-8">{content}</article>
+    </section>
   );
 }
