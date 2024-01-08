@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
-import Head from 'next/head';
+import TagList from '@/components/TagList';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,20 +13,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  // tagsRoute,
 }: {
   children: React.ReactNode;
+  // tagsRoute: React.ReactNode;
 }) {
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body className={`${inter.className} px-2`}>
         <Header />
-        <div className='w-full max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-6 lg:grid-cols-6'>
-          <div className='bg-pink-200 hidden lg:grid lg:col-span-1'>one</div>
-          <div className='bg-sky-200 md:col-span-5 lg:col-span-4'>
-            {children}
-          </div>
-          <div className='bg-zinc-200 row-start-1 md:grid md:col-span-1 md:col-start-6'>
-            three
+
+        <div className='w-full mx-auto grid grid-cols-1 md:grid-cols-6 lg:grid-cols-7'>
+          <div className='hidden lg:grid lg:col-span-2' />
+          <div className='md:col-span-5 lg:col-span-4 max-w-[640px]'>{children}</div>
+          <div className='text-right row-start-1 md:grid md:col-span-1 md:col-start-7'>
+            <TagList />
+            {/* {tagsRoute} */}
           </div>
         </div>
         <link

@@ -6,7 +6,7 @@ export default function PostPage({
   data: any;
 }) {
   return (
-    <div className='w-full px-6 bg-slate-800'>
+    <div className=''>
       <h1>{data.title}</h1>
       {content}
     </div>
