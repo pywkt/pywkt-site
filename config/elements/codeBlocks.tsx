@@ -1,20 +1,21 @@
 export const codeBlocks = {
-  code: ({
+  figure: ({
     children,
     className,
   }: {
     children: React.ReactNode;
     className: string;
   }) => (
-    <code
+    <figure
       className={className}
       style={{
-        borderRadius: '6px',
+        borderRadius: '10px',
         marginTop: '0.6rem',
         marginBottom: '1.8rem',
       }}
     >
       {children}
-    </code>
+    </figure>
   ),
+  // pre: ({ children }: { children: any }) => <pre style={{ maxWidth: '400px'}}>{children}</pre>
 };

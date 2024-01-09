@@ -34,10 +34,43 @@ time {
 
 p code {
   border-radius: 2px;
-  padding: 0.2rem 0rem;
+  padding: 0rem 0rem;
   font-size: 0.9rem;
-  font-weight: bold;
+  /* font-weight: bold; */
   /* background-color: var(--border-hr) */
+}
+
+.postContent ul {
+  list-style-type: "- ";
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Inline code */
+p span > code,
+li span > code {
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+  font-size: 0.9rem;
+  background-color: #263238 !important;
+  /* font-style: normal !important; */
+  /* color: var(--foreground) !important; */
+  & span {
+  font-style: normal !important;
+    /* color: unset !important; */
+    /* margin-bottom: 0; */
+    /* padding: 0rem 0.5rem; */
+  }
+}
+
+pre {
+  overflow-x: auto;
+  padding: 1rem 0;
+  border-radius: 6px;
+}
+ 
+pre [data-line] {
+  padding: 0 1rem;
 }
 
 html {

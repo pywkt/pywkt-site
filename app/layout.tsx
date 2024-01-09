@@ -39,8 +39,8 @@ export default function RootLayout({
         </div>
 
         <div className='w-full mx-auto grid grid-cols-1 md:grid-cols-6 lg:grid-cols-8'>
-          <div className='hidden lg:grid lg:col-span-2' />
-          <div className='md:col-span-5 lg:col-span-4 max-w-[800px] mx-auto'>
+          <div className='hidden lg:grid lg:col-span-1 xl:col-span-2' />
+          <div className='md:col-span-5 lg:col-span-4 max-w-[800px] px-6 md:px-6 md:mx-auto'>
             {children}
           </div>
           <div className='text-right row-start-1 md:grid md:col-span-2 md:col-start-7'>
