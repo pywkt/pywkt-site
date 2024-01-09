@@ -1,3 +1,4 @@
+import { dankMonoItal } from '@/config/fonts';
 import { format } from 'date-fns';
 
 export default function PostDate({ date }: { date: string }) {
@@ -5,7 +6,7 @@ export default function PostDate({ date }: { date: string }) {
   const formattedDate = format(new Date(isoDate), 'MMMM dd, yyyy');
 
   return (
-    <time dateTime={isoDate} itemProp='dateModified'>
+    <time className={dankMonoItal.className} dateTime={isoDate} itemProp='dateModified'>
       {formattedDate}
     </time>
   );

@@ -9,9 +9,9 @@ export default function PostPage({
 }) {
   return (
     <section className="">
-      <h1 className='text-3xl'>{data.title}</h1>
+      <h1>{data.title}</h1>
       <PostDate date={data.date} />
-      <article className='postContent mt-8'>{content}</article>
+      <article className='postContent'>{content}</article>
     </section>
   );
 }

@@ -6,23 +6,21 @@ export default async function TagPage({
 }: {
   params: { slug: string };
 }) {
-  console.log('tag page params:', params.slug);
-
   const allFiles = await getAllFiles('posts');
   const postData = await getPostMetadata(allFiles);
+  const matchingPosts = postData.filter((post: any) =>
+    post.tags.includes(params.slug),
+  );
 
-  // console.log('postData:', postData)
-  const matchingPosts = postData.filter((post: any) => post.tags.includes(params.slug));
-  // console.log('matching:', matchingPosts)
-
-  return <div>
-    <ul>
-      {matchingPosts.map((post: any) => (
-      <li key={post.title}>
-          <ListPost post={post} />
-      </li>
-      ))}
-
-    </ul>
-  </div>;
+  return (
+    <div>
+      <ul>
+        {matchingPosts.map((post: any) => (
+          <li key={post.title}>
+            <ListPost post={post} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

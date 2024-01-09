@@ -4,13 +4,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import TagList from '@/components/TagList';
 import ThemeToggle from '@/components/ThemeToggle';
-import {
-  dankMonoReg,
-  dankMonoItal,
-  blexMonoReg,
-  blexMonoItal,
-  blexMonoBold,
-} from '@/config/fonts';
+import { dankMonoReg } from '@/config/fonts';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
@@ -29,11 +23,8 @@ export default function RootLayout({
   const theme: string = isTheme ? cookieValue : defaultTheme;
 
   return (
-    <html
-      lang='en'
-      className={`${dankMonoReg.variable} ${dankMonoItal.variable} ${theme}`}
-    >
-      <body className={`px-2 font-reg`}>
+    <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
+      <body>
         <Header />
         <div className='themeToggleContainer'>
           <ThemeToggle currentTheme={theme} />

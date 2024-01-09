@@ -18,6 +18,39 @@
   }
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 1.6rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+h4 {
+  font-size: 1rem;
+}
+
+h5 {
+  font-size: 0.8rem;
+}
+
+h6 {
+  font-size: 0.6rem;
+}
+
 a {
   transition: color 150ms;
 
@@ -36,6 +69,26 @@ p code {
   border-radius: 2px;
   padding: 0rem 0rem;
   font-size: 0.9rem;
+}
+
+.allPostsList {
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+
+  p {
+    margin: 0.6rem 0;
+  }
+
+  hr {
+    margin: 1.25rem 0;
+    border-color: var(--border-hr);
+  }
+}
+
+.postContent {
+  margin-top: 1.4rem;
 }
 
 .postContent ul {
@@ -208,4 +261,8 @@ html {
   color: var(--foreground);
   background-color: var(--background);
   border: var(--border-hr);
+}
+
+body {
+  padding: 0 1rem;
 }

@@ -10,8 +10,6 @@ import { revalidatePath } from 'next/cache';
  */
 export const setTheme: VoidFunction = (currentTheme = '') => {
   const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-  console.log('newTheme:', newTheme)
   cookies().set('theme', newTheme);
   revalidatePath('/');
 };
-
