@@ -1,0 +1,32 @@
+export const data = {
+title: "Host a Git Repo on a Subdomain with Cloudflare",
+slug: "20230224-host-gitlab-repo-on-subdomain-cloudflare",
+author: 'pywkt',
+description: "This site is hosted on Cloudflare Pages, but I have another repo on the same Gitlab account that I want to put on a subdomain of pywkt.com. This turned out to be a really simple task that took me a really long time...",
+date: '2023-02-24',
+tags: ["cloudflare", "gitlab"]
+}
+
+This site is hosted on Cloudflare Pages, but I have another repo on the same Gitlab account that I wanted to put on a subdomain of pywkt.com. Since Cloudflare is already managing my DNS for the site, I assumed I would just add a CNAME record for pywkt.com that pointed to the `<repo>.pages.dev` URL that Cloudflare gives me when I host a repo on Pages. This is the correct idea, but I just went about it the wrong way.
+
+---
+
+The following instructions assume you already have a domain in your Cloudflare account. You don't have to purchase the domain through Cloudflare, but Cloudflare should be managing the DNS records for the domain you want to use.
+
+- Log in to Cloudflare
+- Click 'Pages' in the left hand menu
+- Click the 'Create a project' button
+- Select 'Connect to git'
+- If your Git account isn't already connected, you will have to do that here. Once it's connected you'll see all the repos on that account.
+- Select the repo you want to host on a subdomain
+- When it asks for the domain you want to use, enter the domain _with_ the subdomain.
+
+> __The root domain must already be connected to your Cloudflare account.__ For me, I entered something like: `whatever.pywkt.com`
+- You'll have to either put in the build commands or have Cloudflare do it for you by choosing the type of site. For me it was a simple Create React App site so I just chose that.
+- It'll also ask you to confirm that a CNAME record will be added to your domain's DNS. Confirm that and in a minute or two it should be good to go.
+
+Simple.
+
+The way I was originally trying to do it was through the domain's DNS options. I had my repo hosted already by Cloudflare at a `<repo>.pages.dev` URL from Cloudflare and I was trying to add a CNAME with that as the value, but when I would visit the subdomain on pywkt.com I kept getting Cloudflare timeout errors and couldn't figure out why. Turns out you do it from the start of setting up the repo. And that's that.
+
+__Note:__ I may have the order of setting up build commands and confirming the DNS change mixed up. I just wrote this from memory, but will make a note to update that the next time I do this if it's backwards.

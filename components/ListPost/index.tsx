@@ -10,8 +10,8 @@ export default function ListPost({ post }: { post: any }) {
       <PostDate date={post.date} />
       <p className='text-md my-4'>{post.description}</p>
       {post.tags.map((tag: string) => (
-        <span key={tag} className='text-xs mr-1'>
-          <Link href={`/tag/${tag}`}>{`#${tag} `}</Link>
+        <span key={tag} className='listPostTags text-xs mr-1'>
+          <Link href={`/tag/${tag}`}>{`${tag} `}</Link>
         </span>
       ))}
 

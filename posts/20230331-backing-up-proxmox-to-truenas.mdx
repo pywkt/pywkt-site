@@ -1,0 +1,90 @@
+export const data = {
+title: "Backing up Proxmox LXCs/VMs to TrueNAS Scale",
+slug: "20230331-backing-up-proxmox-to-truenas",
+author: "pywkt",
+description: "Setting up Proxmox to use a dataset in TrueNAS for daily backups",
+date: "2023/03/31",
+tags: ["proxmox", "truenas", "networking"]
+}
+
+One of the reasons I wanted to set up an actual NAS on my network was because I wasn't able to backup all my Proxmox containers the way I really wanted to. With the space I had allocated in Proxmox I was really only able to have one days worth of backups, with the exception of my "dev" container, which I was keeping about three days worth. My solution to this was to set up a TrueNAS instance and send all the Proxmox backups there.
+
+---
+
+These steps assume you already have Proxmox and TrueNAS set up and running on your local network
+
+### Datasets
+
+> I'm making this dataset at the top level of my pool. It will be the main folder for all the devices I save backups for, but right now I'm just setting it up for Proxmox.
+
+#### Creation
+Log in to your TrueNAS server and click the "Datasets" option from the menu on the left
+- Click the "Add Dataset" button at the top right of the screen
+- Give your dataset a name. I'm calling mine `backup`
+- Add a comment if you want: `Top level backup dataset`
+- Click "Save"
+
+Once that's done, you should see the "backup" folder as a child of your main pool.
+
+- Click the "backup" dataset and add another dataset to that one. We're basically just making folders here. I'm calling this dataset `proxmox-backup` and the comment is just something like `Used for Proxmox backups`
+- Click "Save"
+
+Once again, we see this new folder as a child, but this time it's a child of the "backup" folder
+
+You can probably see where I'm going with this. Eventually I'll have other folders like _phones, laptops etc..._ and each folder will have different permissions based on who/what is pushing data to them. And speaking of permissions...
+
+#### Permissions
+
+- With the `proxmox-backup` dataset still selected, click the "Edit" button on the Permissions card
+- Select all the checkboxes*
+- Save
+
+_*_ I feel like the _proper_ way to do this is by setting the permissions based on just the user or just the group, but I couldn't seem to get Proxmox to bring in the share like that. So to make up for that, in the next step we set it up so only the Proxmox IP address can access the share 🤷‍♀️
+
+#### Sharing
+
+- Click the "Shares" button in the menu on the left
+- On the UNIX (NFS) Shares row, click the "Add" button
+- In the Path section, select the folder you just made for Proxmox backups
+- Add a description if you want. It doesn't really matter.
+- In the Hosts textfield, add the IP address of your Proxmox server `192.168.X.X`. This will make it so only the Proxmox container can write to this dataset
+- Save
+
+That's it for the TrueNAS part of it. Now we'll set up Proxmox.
+
+### Configuring Proxmox
+
+- In Proxmox, select your Datacenter and select the "Storage" tab
+- Click the "Add" dropdown and select "NFS"
+- Give it an ID. Mine will be `truenas-backup`
+- Enter the IP address of your TrueNAS server
+- Click the dropdown for the Export option and the path to the dataset we created in TrueNAS should be shown. Select that.
+
+Since this is only going to be for backing up Proxmox, I'm going to deselect the default Disk Image option in Content and select `VZDump backup file` instead
+
+Everything else can stay the same.
+
+- Click "Add"
+
+### Configure backups to use the TrueNAS dataset
+
+Still on the Datacenter section
+- Select "Backup" from the menu
+- Click the "Add" button at the top
+- In the Storage dropdown, select the `truenas-backup` we just created
+
+For the schedule I set it to `04:00` so it runs the backup at 4am every night
+
+For Selection Mode I keep it on "Include selected VMs" and select the ones I want to backup
+
+On the "Retention" tab I have it set to Keep Last: 3 and Keep Daily: 3 so it will always have the last three days of backups
+
+- Click the Create button
+
+### Test it out
+
+When you select the new backup task that we just created, the "Run now" button should become enabled. Click that to start the backup.
+
+Go to your TrueNAS Datasets page and select the `proxmox-backup` dataset and refresh the page. If everything worked correctly, the Total Allocation value should now reflect the size of your backups.
+
+Now that it's finished I can see that it wrote 28GiB to the dataset, which means if I'm keeping three days worth of backups, the total size it occupies should be around 84Gib

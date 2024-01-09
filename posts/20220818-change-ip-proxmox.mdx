@@ -1,0 +1,27 @@
+export const data = {
+title: "Update the IP Address on a Proxmox Host",
+slug: "20220818-change-ip-proxmox",
+author: 'pywkt',
+description: "In the process of redoing my home network, I ran in to a problem where my Proxmox server wasn't getting an updated IP from the new router/subnet. This was due to the default Proxmox setup using a static IP and the new system couldn't access it...",
+date: '2022-08-18',
+tags: ["proxmox", "networking"]
+}
+
+In the process of redoing my network I ran in to a problem where my Proxmox server wasn't getting an updated IP from the new router. Turn out this was happening because during the initial setup when you type in the IP for Proxmox to use, that's the one you're stuck with.
+
+Previously I was using a `192.168.1.0/24` subnet, but now I need to get my Proxmox on something like `192.168.3.0/24` and since I can't access the old subnet it's not possible to SSH in to the Proxmox server and change it.
+
+### Solution:
+  - Connect a keyboard/monitor to the device hosting the Proxmox node and login as `root`
+  - Edit the interfaces file: `nano /etc/network/interfaces`
+  - Change the old IP address to whatever new one you want to use
+  - Save and exit: `Ctrl + o`, `Ctrl + x`
+  - Edit the hosts file: `nano /etc/hosts`
+  - Change the old IP address to the same new one
+  - Save and exit: `Ctrl + o`, `Ctrl + x`
+  - Reload the network interfaces file: `ifreload -a`
+  - Shutdown the device: `shutdown`
+
+You can also reboot the system in the last step, but I had to move my server back to the rack in another part of the house.
+
+Reference: [proxmox support forum](https://forum.proxmox.com/threads/help-with-changing-ip-address-reinstalling.55421)

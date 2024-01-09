@@ -5,7 +5,7 @@ export default async function TagList() {
   const uniqueTags = await getAllTags('posts');
 
   return (
-    <ul>
+    <ul className="tagListUl">
       {uniqueTags.map((tag: string) => (
         <li key={tag} className="leading-4">
           <Link href={`/tag/${tag}`} className="text-xs">{tag}</Link>

@@ -1,0 +1,45 @@
+export const data = {
+title: "A Keyboard Story",
+slug: "20220824-keyboard-journey",
+date: "2022-08-24",
+description: "A lot of words on the journey from 43 words per minute to 100+ in about a year...",
+tags: ["keyboards"]
+}
+
+![My custom keyboard with no name](/images/posts/keyboard-journey/my-custom-keyboard.jpg)
+
+When I tell people that "keyboards" is a hobby of mine, the next words out of their mouths is usually "What kind of keyboards?". Then I say, "computer keyboards...". After that, their face says it all.
+
+Usually they're a combination of surprised and curious. They more often than not know I'm a developer so they assume it's some insane keyboard required for my job. Like, without this keyboard they've never heard of, I wouldn't be able to do the work I do. Once I tell them that they're just "regular old keyboards" that type the same letters and numbers as every other keyboard they've ever used in their life, the "enthusiasm" dissipates and the only thing they're thinking is _"why?"_.
+
+Then I go on and on about how _cool_ they are. About how they're just like any other keyboard, but they can _"do things"_ and you can program them to _"do things"_. The best part though is when I tell them the price. Something about seeing people's reactions when they hear that there's keyboards that cost more than their new iPhone. Or that there's a whole community of people even interested in keyboards at all. Something as mundane as a computer keyboard.
+
+But I think that's what I love most about them. The fact that something so simple, so mundane, something that gets taken for granted by probably 99% of people every day, can have so many tiny nuances than you would never even think about unless you're privy to this world.
+
+> It was a long road and cost a lot of money to get here, but in my opinion, it was totally worth it.
+
+A few years ago I worked a job where 100% of my work could be done on a single laptop. Everything was done in Wordpress and a browser was really all I needed. February of 2020 that changed and I found myself in a role that involved using actual development skills/tools and the thirteen inch MacBook screen just wasn't going to cut it any more. My partner and I had been traveling quite a bit around that time and I started the new job while we were away for a few months. I had brought a portable monitor with me, so I had the screen part covered, and I had a mouse so I didn't have to use the trackpad on the laptop, but it was a bit awkward typing on the laptop keyboard and looking at the laptop screen and then also looking at the external monitor. I felt like I needed to be sitting further away, and for that to happen I needed a keyboard that wasn't attached to my screen.
+
+Up until this point I didn't care about what keyboard I used. I typed "computer keyboard" in to Amazon and was a click away from having a working keyboard at the door in the morning. But then I saw there were several different types of keyboards I could get. I didn't want one loaded with RGB nonsense, but maybe there was something else I'd like to try. And after a few days of looking around, I settled on something totally different than what I had expected.
+
+---
+
+My first "custom" keyboard was a [Planck](https://drop.com/buy/preonic-mechanical-keyboard?defaultSelectionIds=967853) from Drop.com and I loved it. I really loved how small it was and it was also my first time using an [ortholinear](https://www.reviewgeek.com/70291/what-is-an-ortholinear-keyboard-and-should-you-use-one/) layout. It took about a week or two to get used to that, but eventually I grew to love it. I ordered the purple one, but eventually cerekote'd it white. I also knew absolutely nothing about switches, but I ordered some [Drop Halo (true)](https://drop.com/buy/drop-halo-switch-pack?defaultSelectionIds=965304%2C965305) and some random lube from Amazon, it wasn't Krytox, but looking back now, it really wasn't that bad either.
+
+After using the Planck for a few months and really liking the format, I decided to try out other keyboards with a similar layout, so I got a [Plaid](https://keycapsss.com/diy-kits/90/plaid-gold-keyboard-kit-usb-c-mx/choc?c=17) from keycapsss.com. Basically the same thing as the Planck, but with through-hole components, so it looked cool. I built this one with Gateron Black Ink switches, which are still my favorite.
+
+While using the Plaid as my daily, I really started to notice that over the years I had developed a slurry of bad typing habits. This is probably because I never "learned" to type. I've been using computers my entire life, seriously, when I was a kid my dad sold big chunky Apple computers so we _always_ had one in the house, but I always thought typing, as a skill, was boring. So for _years and years_ I did some mangled version of typing, but on typing tests I could never get over 43wpm and still had to look at the keys. Enter [Colemak](https://en.wikipedia.org/wiki/Colemak).
+
+In 2019 I came across [keybr.com](https://keybr.com) from a search similar to "how to learn touch typing". I really can't speak highly enough of the site. Check it out if you're interested in learning a different layout and/or [touch typing](https://en.wikipedia.org/wiki/Touch_typing). I figured if I was going to learn to type, I may as well try an "efficient" layout rather than bother to correct the jacked-up thing I was already doing. After a few months, a shit-ton of practice, and having to jump between Colemak and Qwerty on a daily basis, I finally felt comfortable enough to go Colemak full time.
+
+Of course the journey doesn't end there, I mean, if I'm loving ortho so much, maybe a split keyboard would be even better since I don't need to look at the keys anymore. So I bought a Nyquist.
+
+It was basically just a split Planck/Plaid. Same layout and everything. While using the Nyquist as my daily I jumped in the group buy for the [Underscore 33](https://p3dstore.com/products/_33-pcb-extras-and-3dp-keyboard-case).
+
+Again, loved it. It took a bit of getting-used-to, but once I got all the double-taps and combos set up it was smooth sailing. I seriously loved this damn keyboard, except for one thing; it wasn't split. I had gotten so used to having my hands at more of a distance while using the Nyquist. It felt like my wrists were cramped at a weird angle when I was typing now. I didn't want to change keyboards, but I also _needed_ a split one.
+
+So, like any great DIY self hosting nut, I set out to design my own. How hard could it be? Day after day I followed the same damn tutorials on how to use KiCad. Studied schematics from other projects. Basically just learning all the things I needed to learn in order to get a working keyboard. Once I was pretty sure I had a PCB design ready I sent it to [JLC PCB](https://jlcpcb.com) and in a few weeks my prototype had arrived. For whatever reason I ordered the sample PCBs before I had both sides done and I just ordered samples of the left side, but to my absolute surprise, it worked! I was so damn excited.
+
+After another few weeks designing the right side, and then a solid three days of non-stop work figuring out how to program the damn thing in QMK, it was done. I finally had the keyboard I wanted.
+
+I originally designed it to be a stacked FR4 setup and used it like that for almost a year, but eventually when I got a 3d printer I designed a super basic case and printed that. The only problem now is that the original PCB I made was made to be screwed in to a stacked build and I don't have screw holes in the plate to attach it to the top of the case. And I didn't leave any room to sandwich it either. So as you could guess, It's time to make another version of the PCB/plate and finish this thing off. But for now, everything works great and I love it.

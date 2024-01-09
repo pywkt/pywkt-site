@@ -7,6 +7,9 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    // screens: {
+    //   md: '890px'
+    // },
     extend: {
       fontFamily: {
         reg: ['var(--font-dank-mono-reg)'],

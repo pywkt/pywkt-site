@@ -11,6 +11,7 @@ import {
   blexMonoItal,
   blexMonoBold,
 } from '@/config/fonts';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'pywkt',
@@ -34,23 +35,20 @@ export default function RootLayout({
     >
       <body className={`px-2 font-reg`}>
         <Header />
-        <div className='w-full flex flex-col gap-1 mb-1 items-end justify-end'>
+        <div className='themeToggleContainer'>
           <ThemeToggle currentTheme={theme} />
         </div>
 
-        <div className='w-full mx-auto grid grid-cols-1 md:grid-cols-6 lg:grid-cols-8'>
-          <div className='hidden lg:grid lg:col-span-1 xl:col-span-2' />
-          <div className='md:col-span-5 lg:col-span-4 max-w-[800px] px-6 md:px-6 md:mx-auto'>
+        <div className='pageGrid'>
+          <div className='leftSpacerGrid' />
+          <div className='mainContentContainer'>
             {children}
+            <Footer />
           </div>
-          <div className='text-right row-start-1 md:grid md:col-span-2 md:col-start-7'>
+          <div className='tagListContainer'>
             <TagList />
           </div>
         </div>
-        {/* <link */}
-        {/*   rel='stylesheet' */}
-        {/*   href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css' */}
-        {/* /> */}
       </body>
     </html>
   );
