@@ -1,0 +1,338 @@
+export const data = {
+title: "Fresh Install of Immich on a Proxmox VM",
+slug: "20240103-setting-up-immich",
+author: "pywkt",
+description: "Step by step instructions on how to get up and running with Immich on a Proxmox VM. I'll also set up machine learning to be offloaded to another machine and use Intel Quicksync for video transcoding.",
+date: "2024/01/03",
+tags: ["proxmox", "immich", "photos", "ubuntu"],
+}
+
+Immich is probably the best self hosted and local way to manage, store and view your photos. I've been using it for quite a while now to backup photos from my phone, but in the past I had the NUC doing all the heavy-lifting. In this guide I'm going to pass that off to a better equipped machine and also pass through Quicksync for transcoding videos. I'm also going to set up a dataset in TrueNAS to store all the photos. And of course I'll be doing all of this in Proxmox.
+
+
+---
+
+### Ubuntu Server Setup
+
+Normally I would prefer to use an LXC instead of a full VM, but Immich suggests using Docker and I don't feel like
+setting up each service one by one, so that means I'll be doing this in a VM. I really don't like running Docker in an LXC.
+
+
+
+Create a new VM in Proxmox, I'm using Ubuntu 22.04, 4 cores, 4GB of ram and 24GB HDD.
+
+Once that's up and running go through the install process. When it asks if you want any packages pre installed, don't select any, just skip through.
+
+Now you should be logged in and in the terminal.
+
+Update the system
+
+```shell
+sudo apt update && sudo apt upgrade
+```
+
+The next two steps are optional, but I'll be using Vim as my text editor and Zsh as my shell.
+Install some quality-of-life packages
+
+```shell
+sudo apt install neovim zsh
+```
+
+Install oh-my-zsh
+
+```shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+---
+
+### Docker
+
+Install Docker Stuff
+```shell
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+```
+
+Add GPG key
+```shell
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+Add Docker repo to apt
+```shell
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+Update
+```shell
+sudo apt update
+```
+
+Check to see that it's ready to go. If you see something like (Installed), you're good to go.
+```shell
+apt-cache policy docker-ce
+```
+
+Install
+```shell
+sudo apt install docker-ce
+```
+
+Check
+```shell
+sudo systemctl status docker
+```
+
+You should see the docker version.
+
+---
+
+### Docker Compose
+
+Docker is cool, but Docker Compose is a better way of using it. Let's get that going now.
+
+Create a directory for Docker Stuff
+```shell
+mkdir -p ~/.docker/cli-plugins/
+```
+
+Install Docker Compose
+```shell
+curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+```
+
+Set permissions
+```shell
+chmod +x ~/.docker/cli-plugins/docker-compose
+```
+
+Check version
+```shell
+sudo docker compose version
+```
+
+You should now see the Docker Compose version. If you've used Docker Compose before and you're used to the command being `docker-compose`, just know that they've updated it and the new command is now `docker compose`. Everything else should be the same, but there's just no hyphen (-) anymore.
+
+---
+
+This is where we start to deviate on our own path. My Immich server is going to be storing all the photos on my TrueNAS server, so we need to set up a dataset to hold everything and then link it up with our VM.
+
+---
+
+### TrueNAS
+
+Create a dataset in TrueNAS and set up the permissions as you wish. When developing I tend to set read/write for everyone and only allow specific IP addresses in the NFS rules, but it's up to you.
+
+Set up an NFS share for the dataset you just created and put in the IP address of your Immich VM in the allow list. Or you can just put you local subnet and allow all devices on your network, whatever works for you.
+
+---
+
+Back on the Immich VM.
+
+### NFS
+
+Install nfs-common
+```shell
+sudo apt install nfs-common
+```
+
+Make shared directory for images. I like to keep all my external/network shares in the `/mnt` folder.
+```shell
+sudo mkdir /mnt/immich-nas
+```
+
+Obviously replace the next line with the IP address/path of you TrueNAS dataset.
+```shell
+sudo mount 192.168.X.X:/mnt/<pool>/<dataset> /mnt/immich-nas
+```
+
+Check that it mounted
+```shell
+df -h
+```
+
+In the Filesystem column you should see the IP address of the NAS and the path of the dataset. The Mounted On column should have `/mnt/immich-nas`
+
+Set the Immich server to mount this folder when it boots up
+```shell
+sudo nvim /etc/fstab
+```
+
+Add to the bottom of the file
+```shell
+192.168.X.X:/mnt/<pool>/<dataset> /mnt/immich-v2 nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+```
+
+---
+
+### Immich
+
+Now that we're all set up it's finally time to install Immich.
+
+Create a directory for the Docker files
+```shell
+mkdir ~/immich-app
+```
+
+Navigate to the new directory
+```shell
+cd ~/immich-app
+```
+
+Download the Docker Compose file
+```shell
+wget https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+```
+
+Download the .env file
+```shell
+wget -O .env https://github.com/immich-app/immich/releases/latest/download/example.env
+```
+
+Download the hardware acceleration file (optional)
+```shell
+wget https://github.com/immich-app/immich/releases/latest/download/hwaccel.yml
+```
+
+Edit the .env file
+- Change `UPLOAD_LOCATION` value to `/mnt/immich-nas`
+- Update `DB_PASSWORD` to a random string
+
+---
+
+### Quicksync
+
+Since my Proxmox server is an Intel NUC with Quicksync, I'm going to pass that through to the VM so Immich can use it to transcode. If you aren't going to use Quicksync or don't have it available you can skip this part.
+
+Install some hardware packages
+```shell
+sudo apt install --install-recommends linux-generic-hwe-22.04
+```
+
+Download/install the Intel Compute-Runtime stuff
+Follow the steps on this page.
+```shell
+https://github.com/intel/compute-runtime/releases
+```
+
+Log in to the Proxmox web ui and add the Intel driver to the VM
+- Select the VM
+- Go to the Hardware tab
+- Click Add > PCI
+- Select the Intel graphics driver option
+- Stop and restart VM
+- SSH back in
+
+Once you're back in the VM, type
+`ls -l /dev/dri`
+
+You should see something like `renderD128` listed now.
+
+Go in to the Immich folder with the config files
+```shell
+cd ~/immich-app
+```
+
+Edit the `hwaccel` file
+```shell
+nvim hwaccel.yml
+```
+
+Uncomment the Intel lines in `hwaccel.yml` to pass the folder to the container.
+```yml
+services:  
+ hwaccel:  
+   devices:  
+     - /dev/dri:/dev/dri  # If using Intel QuickSync or VAAPI
+```
+
+Enable the `hwaccel` file in the docker-compose file
+```yml
+immich-microservices:  
+   container_name: immich_microservices  
+   image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}  
+   extends:  
+     file: hwaccel.yml  
+     service: hwaccel  
+   command: [ "start.sh", "microservices" ]
+```
+
+---
+
+At this point the Immich server should be up and running and you should be able to log in/create the admin account by going to
+```shell
+http://192.168.X.X:2283
+```
+
+### Remote Machine Learning
+
+The Intel NUC is a pretty great server, but I'm planning on throwing a bunch of photos in here and I want to use Immich's facial recognition features. This can really bog down the NUC so I'm going to offload this work to another machine I have in the house that I mainly use for AI/ML/LLM stuff. The Following steps will be done on that computer, which is also running Ubuntu 22.04, but the full desktop version with an RTX 3060 Ti graphics card.
+
+This computer didn't already have Docker installed so I followed the steps above for installing Docker/Docker Compose.
+
+Create a folder for the Docker Compose file
+```shell
+mkdir -p ~/immich-ml && cd ~/immich-ml
+```
+
+Create the compose file
+```shell
+touch docker-compose.yml
+```
+
+Edit the file
+```shell
+nvim docker-compose.yml
+```
+
+Add the Following
+```yml
+version: '3.8'
+
+services:
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    volumes:
+      - model-cache:/cache
+    restart: always
+    ports:
+      - 3003:3003
+
+volumes:
+  model-cache:
+```
+Save, exit and run the container
+```shell
+sudo docker compose up
+```
+
+You can also add the `-d` flag here, but since it's my first time running this I'm going to omit that so I can see the logs.
+
+Open up the Immich web ui and log in as the administrator if you've already set that up. If not just go to `http://192.168.X.X:2283` and set up the admin account now.
+
+Once logged in as the administrator, click the `Administration` button at the top right and go to `Settings > Machine Learning Settings`
+
+In the URL textfield, put in the IP address of the machine running the `immich-machine-learning` container with the port `3003`.
+```shell
+http://192.168.X.X:3003
+```
+
+Save the settings.
+
+---
+
+In the past I've run in to issues where the Immich logs take up so much space it fills up the VM storage. So I like to set the Log Level to either Error or Fatal once I'm confident everything is working as it should.
+
+And that's that. We've got Immich up and running with all the machine learning stuff offloaded to a computer that can handle it and Quicksync ready to transcode all those stupid hevc (or whatever) files from people with iPhones. Even if you're the only one using it, I still suggest making yourself a new account that isn't the admin account. Keep the admin account just for admin stuff.
+
+
+
+
+
+
+
+
+
+
+

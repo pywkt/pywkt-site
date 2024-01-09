@@ -4,49 +4,44 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: #1d3557;
+    --background: #fbf9f1;
+    --border-hr: #e5e1da;
+    --link-hover: #e63946;
+  }
 
-    a {
-      transition: color 200ms;
-      &:hover {
-        color: darkgrey;
-        transition: color 200ms;
-      }
-    }
-
-    .dark {
-      --background: 222.2 84% 4.9%;
-      --foreground: 210 40% 98%;
-    }
+  .dark {
+    --foreground: #e0fbfc;
+    --background: #293241;
+    --border-hr: #233f4a;
+    --link-hover: #ee6c4d;
   }
 }
 
+a {
+  transition: color 150ms;
 
-/* :root { */
-/*   --foreground-rgb: 0, 0, 0; */
-/*   --background-start-rgb: 214, 219, 220; */
-/*   --background-end-rgb: 255, 255, 255; */
-/* } */
-/**/
-/* @media (prefers-color-scheme: dark) { */
-/*   :root { */
-/*     --foreground-rgb: 255, 255, 255; */
-/*     --background-start-rgb: 0, 0, 0; */
-/*     --background-end-rgb: 0, 0, 0; */
-/*   } */
-/* } */
+  &:hover {
+    color: var(--link-hover);
+    transition: color 150ms;
+  }
+}
 
-/* code { */
-/*   border-radius: 50px; */
-/* } */
+time {
+  font-style: italic;
+  font-size: 0.75rem;
+}
 
-/* body { */
-  /* color: rgb(var(--foreground-rgb)); */
-  /* background: linear-gradient( */
-  /*     to bottom, */
-  /*     transparent, */
-  /*     rgb(var(--background-end-rgb)) */
-  /*   ) */
-  /*   rgb(var(--background-start-rgb)); */
-/* } */
+p code {
+  border-radius: 2px;
+  padding: 0.2rem 0rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  /* background-color: var(--border-hr) */
+}
+
+html {
+  color: var(--foreground);
+  background-color: var(--background);
+  border: var(--border-hr);
+}

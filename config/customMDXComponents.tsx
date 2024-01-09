@@ -1,29 +1,17 @@
-import Link from 'next/link';
+import { headings } from './elements/headings';
+import { hRule } from './elements/hRule';
+import { codeBlocks } from './elements/codeBlocks';
+import { links } from './elements/links';
+import { text } from './elements/text';
 
 type CustomComponents = {
   [key in string]: Function;
 };
 
 export const customComponents: CustomComponents = {
-  a: (link: { href: string; children: string }) => {
-    const { href, children } = link;
-    const isExternal = href.includes('https://');
-
-    return (
-      <Link href={href} target={isExternal ? '_blank' : '_self'}>
-        {children}
-      </Link>
-    );
-  },
-  code: ({
-    children,
-    className,
-  }: {
-    children: React.ReactNode;
-    className: string;
-  }) => (
-    <code className={className} style={{ borderRadius: '10px' }}>
-      {children}
-    </code>
-  ),
+  ...codeBlocks,
+  ...headings,
+  ...hRule,
+  ...links,
+  ...text,
 };

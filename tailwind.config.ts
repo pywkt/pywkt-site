@@ -12,6 +12,11 @@ const config: Config = {
         reg: ['var(--font-dank-mono-reg)'],
         ital: ['var(--font-dank-mono-ital)'],
       },
+      colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        border: 'var(--border-hr)'
+      },
     },
   },
   plugins: [],

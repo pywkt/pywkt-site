@@ -15,10 +15,10 @@ export default async function TagPage({
   const matchingPosts = postData.filter((post: any) => post.tags.includes(params.slug));
   // console.log('matching:', matchingPosts)
 
-  return <div className="">
+  return <div>
     <ul>
       {matchingPosts.map((post: any) => (
-      <li key={post.title} className="">
+      <li key={post.title}>
           <ListPost post={post} />
       </li>
       ))}

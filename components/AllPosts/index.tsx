@@ -5,14 +5,12 @@ export default async function AllPosts() {
   const allFiles = await getAllFiles('posts');
   const postData = await getPostMetadata(allFiles);
 
-  // console.log('postData:', postData);
-
   return (
-    <div className="">
+    <div>
       <ul>
         {postData.map((post: any) => {
           return (
-            <li key={post.title} className="">
+            <li key={post.title}>
               <ListPost post={post} />
             </li>
           );

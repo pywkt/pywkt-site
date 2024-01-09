@@ -15,7 +15,7 @@ export default function ListPost({ post }: { post: any }) {
         </span>
       ))}
 
-      <hr className='my-6' />
+      <hr className='my-6 border-border' />
     </section>
   );
 }
