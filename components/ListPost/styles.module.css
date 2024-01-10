@@ -1,0 +1,24 @@
+.allPostsList {
+  h1 {
+    font-size: var(--text-lg);
+    margin-bottom: 0;
+  }
+
+  p {
+    margin: 0.6rem 0;
+  }
+
+  hr {
+    margin: 1.25rem 0;
+    border-color: var(--border-hr);
+  }
+
+  .listPostTags {
+    margin-right: 0.5rem;
+    font-size: var(--text-xs);
+
+    &::before {
+      content: '#';
+    }
+  }
+}

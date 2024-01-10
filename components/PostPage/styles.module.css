@@ -1,0 +1,48 @@
+.post {
+  margin-top: 1.4rem;
+}
+
+.post ul {
+  list-style-type: '- ';
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.post blockquote {
+  margin: 1.6rem 0rem;
+  padding-left: 1rem;
+  border-left: 10px ridge var(--link-hover);
+}
+
+.post a {
+  font-weight: bold;
+}
+
+.post p code {
+  border-radius: 20px;
+  padding: 0rem 0rem;
+  font-size: 0.9rem;
+}
+
+/* Inline code */
+.post p span>code,
+.post li span>code {
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+  font-size: 0.9rem;
+  background-color: #263238 !important;
+
+  & span {
+    font-style: normal !important;
+  }
+}
+
+.post pre {
+  overflow-x: auto;
+  padding: 1rem 0;
+  border-radius: 6px;
+}
+
+.post pre [data-line] {
+  padding: 0 1rem;
+}

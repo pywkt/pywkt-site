@@ -1,5 +1,6 @@
 import { dankMonoItal } from '@/config/fonts';
 import { format } from 'date-fns';
+import styles from './styles.module.css';
 
 export default function PostDate({ date }: { date: string }) {
   const isoDate = new Date(date).toISOString();

@@ -6,6 +6,7 @@ import TagList from '@/components/TagList';
 import ThemeToggle from '@/components/ThemeToggle';
 import { dankMonoReg } from '@/config/fonts';
 import Footer from '@/components/Footer';
+import styles from './layouts.module.css';
 
 export const metadata: Metadata = {
   title: 'pywkt',
@@ -17,6 +18,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { leftSpacerGrid, mainContentContainer, pageGrid, tagListContainer, themeToggleContainer } = styles;
   const defaultTheme = 'light';
   const cookieValue = cookies().get('theme')?.value || '';
   const isTheme = cookieValue === defaultTheme || cookieValue === 'dark';
@@ -26,17 +28,17 @@ export default function RootLayout({
     <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
       <body>
         <Header />
-        <div className='themeToggleContainer'>
+        <div className={themeToggleContainer}>
           <ThemeToggle currentTheme={theme} />
         </div>
 
-        <div className='pageGrid'>
-          <div className='leftSpacerGrid' />
-          <div className='mainContentContainer'>
+        <div className={pageGrid}>
+          <div className={leftSpacerGrid} />
+          <div className={mainContentContainer}>
             {children}
             <Footer />
           </div>
-          <div className='tagListContainer'>
+          <div className={tagListContainer}>
             <TagList />
           </div>
         </div>

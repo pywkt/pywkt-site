@@ -1,0 +1,5 @@
+.footer {
+  font-size: var(--text-xs);
+  width: 100%;
+  margin: 2rem 0;
+}

@@ -1,4 +1,5 @@
 import PostDate from '../PostDate';
+import styles from './styles.module.css';
 
 export default function PostPage({
   content,
@@ -7,11 +8,12 @@ export default function PostPage({
   content: React.ReactNode;
   data: any;
 }) {
+  const { post } = styles;
   return (
-    <section className="">
+    <section className=''>
       <h1>{data.title}</h1>
       <PostDate date={data.date} />
-      <article className='postContent'>{content}</article>
+      <article className={post}>{content}</article>
     </section>
   );
 }

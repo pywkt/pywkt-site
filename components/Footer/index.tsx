@@ -1,9 +1,13 @@
 import Link from 'next/link';
+import styles from './styles.module.css';
 
 export default function Footer() {
+  const { footer } = styles;
   return (
-    <div className='text-xs w-full flex-col justify-center items-center gap-2 mt-12 mb-8'>
-      <p className='font-bold'><Link href="/">pywkt</Link></p>
+    <div className={footer}>
+      <p className='font-bold'>
+        <Link href='/'>pywkt</Link>
+      </p>
       {/* <p>|</p> */}
       {/* <p className='font-ital'>a collection of notes</p> */}
       {/* <p className="footerLinks font-ital"> */}
