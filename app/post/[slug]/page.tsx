@@ -1,38 +1,95 @@
 import fs from 'node:fs/promises';
 import { compile, run } from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
-import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import { customComponents } from '@/config/customMDXComponents';
 import PostPage from '@/components/PostPage';
 import rehypePrettyCode from 'rehype-pretty-code';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
+import { Metadata } from 'next';
+import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
 
+type Props = {
+  params: { id: string; title: string; slug: string };
+};
+
+export async function generateStaticParams() {
+  const posts = await getAllFiles('posts')
+  return posts.map(post => ({ slug: post.split('.')[0] }))
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const postMeta: any = await getSinglePostMeta(params.slug);
+
+  return {
+    title: {
+      default: 'pywkt.com',
+      absolute: `${postMeta.title} | pywkt.com`,
+    },
+    description: postMeta.description,
+    keywords: postMeta.tags,
+    authors: [{ name: 'pywkt', url: 'https://pywkt.com' }],
+    publisher: 'pywkt',
+    creator: 'pywkt',
+    referrer: 'origin-when-cross-origin',
+    applicationName: 'pywkt.com',
+    generator: 'Next.js',
+    formatDetection: { email: false, address: false, telephone: false },
+    metadataBase: new URL('https://pywkt.com'),
+    openGraph: {
+      title: `${postMeta.title} | pywkt.com`,
+      description: postMeta.description,
+      url: `https://pywkt.com/post/${postMeta.slug}`,
+      siteName: 'pywkt.com',
+      locale: 'en_US',
+      type: 'article',
+      publishedTime: new Date(postMeta.date).toISOString(),
+      authors: ['pywkt'],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: true,
+      googleBot: {
+        index: true,
+        follow: false,
+        noimageindex: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    icons: {
+      icon: '/favicon.ico',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: postMeta.title,
+      description: postMeta.description,
+      creator: 'pywkt',
+    },
+    category: 'technology',
+  };
+}
 export default async function Page({ params }: { params: { slug: string } }) {
-  const cookieValue = cookies().get('theme')?.value || '';
+  // const cookieValue = cookies().get('theme')?.value || '';
 
-  /** @type {import('rehype-pretty-code').Options} */
   const options = {
-    theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
-    // theme: {
-    //   dark: 'github-dark-dimmed',
-    //   light: 'github-light',
-    // },
+    // theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
+    theme: 'material-theme',
     defaultLang: {
       block: 'javascript',
       inline: 'shell',
-      // inline: 'plaintext'
     },
     tokensMap: {
-      txt: "entity.name."
+      txt: 'entity.name.',
     },
-    keepBackground: cookieValue === 'dark' ? true : true
+    // keepBackground: cookieValue === 'dark' ? true : true,
   };
 
   const code = String(
     await compile(await fs.readFile(`./posts/${params.slug}.mdx`), {
       remarkPlugins: [remarkGfm],
-      // rehypePlugins: [rehypeHighlight],
       rehypePlugins: [[rehypePrettyCode, options]],
       outputFormat: 'function-body',
       development: false,

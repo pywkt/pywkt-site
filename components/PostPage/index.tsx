@@ -1,13 +1,16 @@
 import PostDate from '../PostDate';
 import styles from './styles.module.css';
+import { generateMetadata } from '@/app/post/[slug]/page';
 
-export default function PostPage({
+export default async function PostPage({
   content,
   data,
 }: {
   content: React.ReactNode;
   data: any;
 }) {
+// await generateMetadata({params: {id: "rst", title: "www"}, searchParams: {}})
+
   const { post } = styles;
   return (
     <section>

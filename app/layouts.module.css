@@ -10,7 +10,7 @@
 }
 
 .mainContentContainer {
-  max-width: 900px;
+  max-width: 800px;
   padding: 0 1rem;
   grid-row-start: 2;
 }
@@ -62,12 +62,14 @@
   .mainContentContainer {
     margin: 0 auto;
     padding: 0 2rem;
-    grid-column-start: 2;
+    grid-column: span 5 / span 5;
+    /* grid-column-start: 1; */
   }
 
   .tagListContainer {
-    display: grid;
-    grid-column-start: 6;
+    /* display: grid; */
+    grid-column: span 1 / span 1;
+    /* grid-column-start: 6; */
   }
 }
 
@@ -78,15 +80,25 @@
   }
 
   .leftSpacerGrid {
+    grid-column: span 1 / span 1;
     grid-column-start: 1;
     visibility: visible;
   }
 
   .mainContentContainer {
+    grid-column: span 4 / span 4;
     grid-column-start: 3;
+    padding: 0;
   }
 
   .tagListContainer {
     grid-column-start: 8;
+  }
+}
+
+@media (min-width: 1400px) {
+  .mainContentContainer {
+    padding: 0;
+    grid-column-start: 3;
   }
 }

@@ -5,7 +5,7 @@ type CustomComponents = {
   [key in string]: Function;
 };
 
-export const customComponents: CustomComponents = {
+export const customComponents: any = {
   ...images,
   ...links,
 };

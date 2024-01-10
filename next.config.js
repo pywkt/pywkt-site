@@ -1,42 +1,17 @@
-
-// ===
-// import nextMDX from "@next/mdx";
-//
-// const withMDX = nextMDX({
-//   extension: /\.(mdx)?$/,
-//   options: {
-//     remarkPlugins: [],
-//     rehypePlugins: [],
-//   },
-// });
-//
-// const nextConfig = {}
-//
-// export default withMDX({ ...nextConfig, pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx']})
-// ===
-
-
-
-// import remarkFrontmatter from "remark-frontmatter";
-// import nextMDX from "@next/mdx";
-//
-// const withMDX = nextMDX({
-//   extension: /\.mdx?$/,
-//   options: {
-//     remarkPlugins: [remarkFrontmatter],
-//     rehypePlugins: [],
-//   }
-// })
-//
-// return withMDX()
-
-// import withMDX from '@next/mdx';
-//
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   // Configure `pageExtensions` to include MDX files
-//   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
-//   // Optionally, add any other Next.js config below
-// }
-//
-// module.exports = withMDX(nextConfig)
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
+  // output: 'export',
+ 
+  // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
+  // trailingSlash: true,
+ 
+  // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
+  // skipTrailingSlashRedirect: true,
+ 
+  // Optional: Change the output directory `out` -> `dist`
+  // distDir: 'dist',
+}
+ 
+module.exports = nextConfig

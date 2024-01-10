@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache';
  * @throws If an error occurs while setting the theme.
  * @returns
  */
-export const setTheme: VoidFunction = (currentTheme = '') => {
+export const setTheme = (currentTheme = "") => {
   const newTheme = currentTheme === 'light' ? 'dark' : 'light';
   cookies().set('theme', newTheme);
   revalidatePath('/');

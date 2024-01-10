@@ -1,5 +1,11 @@
 import ListPost from '@/components/ListPost';
 import { getAllFiles, getPostMetadata } from '@/util/getPostMetadata';
+import { getAllTags } from '@/util/getTags';
+
+export async function generateStaticParams() {
+  const tags = await getAllTags('posts')
+  return tags.map(tag => ({ slug: tag }))
+}
 
 export default async function TagPage({
   params,

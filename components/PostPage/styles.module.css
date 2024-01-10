@@ -2,6 +2,10 @@
   margin-top: 1.4rem;
 }
 
+.post h1 {
+  font-size: 3rem;
+}
+
 .post p {
   margin-bottom: 1rem;
 }
