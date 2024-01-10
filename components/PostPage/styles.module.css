@@ -2,6 +2,10 @@
   margin-top: 1.4rem;
 }
 
+.post p {
+  margin-bottom: 1rem;
+}
+
 .post ul {
   list-style-type: '- ';
   margin-left: 2rem;
@@ -16,6 +20,10 @@
 
 .post a {
   font-weight: bold;
+}
+
+.post hr {
+  margin: 2rem 0;
 }
 
 .post p code {
@@ -45,4 +53,8 @@
 
 .post pre [data-line] {
   padding: 0 1rem;
+}
+
+.post figure {
+ margin: 0.6rem 0 1.8rem;
 }

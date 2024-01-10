@@ -5,7 +5,7 @@ export default function Footer() {
   const { footer } = styles;
   return (
     <div className={footer}>
-      <p className='font-bold'>
+      <p>
         <Link href='/'>pywkt</Link>
       </p>
       {/* <p>|</p> */}

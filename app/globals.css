@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --foreground: #1d3557;
   --background: #fbf9f1;
@@ -11,9 +7,6 @@
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: 1.5rem;
-  --screen-sm: 640px;
-  --screen-md: 890px;
-  --screen-lg: 1200px;
 }
 
 .dark {

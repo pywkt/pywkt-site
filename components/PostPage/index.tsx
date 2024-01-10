@@ -10,7 +10,7 @@ export default function PostPage({
 }) {
   const { post } = styles;
   return (
-    <section className=''>
+    <section>
       <h1>{data.title}</h1>
       <PostDate date={data.date} />
       <article className={post}>{content}</article>

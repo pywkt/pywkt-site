@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import './preflight.css';
 import './globals.css';
 import Header from '@/components/Header';
 import TagList from '@/components/TagList';

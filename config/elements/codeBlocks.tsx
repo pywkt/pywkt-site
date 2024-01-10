@@ -1,3 +1,5 @@
+// Todo: Add button to copy code to clipboard.
+
 export const codeBlocks = {
   figure: ({
     children,
@@ -5,17 +7,5 @@ export const codeBlocks = {
   }: {
     children: React.ReactNode;
     className: string;
-  }) => (
-    <figure
-      className={className}
-      style={{
-        borderRadius: '10px',
-        marginTop: '0.6rem',
-        marginBottom: '1.8rem',
-      }}
-    >
-      {children}
-    </figure>
-  ),
-  // pre: ({ children }: { children: any }) => <pre style={{ maxWidth: '400px'}}>{children}</pre>
+  }) => <figure className={className}>{children}</figure>,
 };
