@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import { compile, run } from '@mdx-js/mdx';
 
 const allMeta = async (file: string) => {
+  console.log('getPostMetadata:', process.cwd())
   const code = await compile(
     await fs.readFile(`${process.cwd()}/posts/${file}`),
     {

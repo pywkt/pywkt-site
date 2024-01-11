@@ -74,7 +74,6 @@ export default function RootLayout({
   const isTheme = cookieValue === defaultTheme || cookieValue === 'dark';
   const theme: string = isTheme ? cookieValue : defaultTheme;
   const isProd = process.env.NEXT_PUBLIC_IS_PROD === 'true';
-  console.log('isProd:', isProd);
 
   return (
     <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
