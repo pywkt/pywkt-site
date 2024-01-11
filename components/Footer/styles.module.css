@@ -2,8 +2,28 @@
   font-size: var(--text-xs);
   width: 100%;
   margin: 2rem 0;
+}
 
-  p {
-    font-weight: bold;
-  }
+.footerTitle {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer span {
+  font-weight: normal;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footerLinks a::before {
+  content: '> ';
+}
+
+.footerLinks a {
+  font-weight: normal;
 }

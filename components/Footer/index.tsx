@@ -1,18 +1,30 @@
 import Link from 'next/link';
+import { siteInfo } from '@/config/siteInfo';
 import styles from './styles.module.css';
 
 export default function Footer() {
-  const { footer } = styles;
+  const { footer, footerLinks, footerTitle } = styles;
   return (
     <div className={footer}>
-      <p>
+      <p className={footerTitle}>
         <Link href='/'>pywkt</Link>
+        <span> | </span>
+        <span> {siteInfo.siteDescription}</span>
       </p>
       {/* <p>|</p> */}
       {/* <p className='font-ital'>a collection of notes</p> */}
-      {/* <p className="footerLinks font-ital"> */}
-      {/*   <Link href="https://gitlab.com/pywkt" className="">gitlab</Link> */}
-      {/* </p> */}
+      <p className={footerLinks}>
+        {siteInfo.social.map((i) => (
+          <Link
+            href={i.url}
+            target='_blank'
+            rel='noopener noreferrer'
+            key={i.url}
+          >
+            {i.label}
+          </Link>
+        ))}
+      </p>
     </div>
   );
 }

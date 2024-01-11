@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-// import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 import './preflight.css';
 import './globals.css';
 import Header from '@/components/Header';
@@ -68,19 +68,18 @@ export default function RootLayout({
     tagListContainer,
     themeToggleContainer,
   } = styles;
-  // const defaultTheme = 'light';
-  // const cookieValue = cookies().get('theme')?.value || '';
-  // const isTheme = cookieValue === defaultTheme || cookieValue === 'dark';
-  // const theme: string = isTheme ? cookieValue : defaultTheme;
+  const defaultTheme = 'light';
+  const cookieValue = cookies().get('theme')?.value || '';
+  const isTheme = cookieValue === defaultTheme || cookieValue === 'dark';
+  const theme: string = isTheme ? cookieValue : defaultTheme;
 
   return (
-    // <html lang='en' className={`${dankMonoReg.className} ${theme}`}> 
-    <html lang='en' className={dankMonoReg.className}>
+    <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
       <body>
         <Header />
-        {/* <div className={themeToggleContainer}> */}
-          {/* <ThemeToggle currentTheme={theme} /> */}
-        {/* </div> */}
+        <div className={themeToggleContainer}>
+          <ThemeToggle currentTheme={theme} />
+        </div>
 
         <div className={pageGrid}>
           <div className={leftSpacerGrid} />

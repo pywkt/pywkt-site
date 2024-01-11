@@ -27,20 +27,20 @@ Now you should be logged in and in the terminal.
 
 Update the system
 
-```shell
+```bash
 sudo apt update && sudo apt upgrade
 ```
 
-The next two steps are optional, but I'll be using Vim as my text editor and Zsh as my shell.
+The next two steps are optional, but I'll be using Vim as my text editor and Zsh as my bash.
 Install some quality-of-life packages
 
-```shell
+```bash
 sudo apt install neovim zsh
 ```
 
 Install oh-my-zsh
 
-```shell
+```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
@@ -49,37 +49,37 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 ### Docker
 
 Install Docker Stuff
-```shell
+```bash
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 ```
 
 Add GPG key
-```shell
+```bash
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
 
 Add Docker repo to apt
-```shell
+```bash
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
 Update
-```shell
+```bash
 sudo apt update
 ```
 
 Check to see that it's ready to go. If you see something like (Installed), you're good to go.
-```shell
+```bash
 apt-cache policy docker-ce
 ```
 
 Install
-```shell
+```bash
 sudo apt install docker-ce
 ```
 
 Check
-```shell
+```bash
 sudo systemctl status docker
 ```
 
@@ -92,22 +92,22 @@ You should see the docker version.
 Docker is cool, but Docker Compose is a better way of using it. Let's get that going now.
 
 Create a directory for Docker Stuff
-```shell
+```bash
 mkdir -p ~/.docker/cli-plugins/
 ```
 
 Install Docker Compose
-```shell
+```bash
 curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
 ```
 
 Set permissions
-```shell
+```bash
 chmod +x ~/.docker/cli-plugins/docker-compose
 ```
 
 Check version
-```shell
+```bash
 sudo docker compose version
 ```
 
@@ -132,34 +132,34 @@ Back on the Immich VM.
 ### NFS
 
 Install nfs-common
-```shell
+```bash
 sudo apt install nfs-common
 ```
 
 Make shared directory for images. I like to keep all my external/network shares in the `/mnt` folder.
-```shell
+```bash
 sudo mkdir /mnt/immich-nas
 ```
 
 Obviously replace the next line with the IP address/path of you TrueNAS dataset.
-```shell
+```bash
 sudo mount 192.168.X.X:/mnt/<pool>/<dataset> /mnt/immich-nas
 ```
 
 Check that it mounted
-```shell
+```bash
 df -h
 ```
 
 In the Filesystem column you should see the IP address of the NAS and the path of the dataset. The Mounted On column should have `/mnt/immich-nas`
 
 Set the Immich server to mount this folder when it boots up
-```shell
+```bash
 sudo nvim /etc/fstab
 ```
 
 Add to the bottom of the file
-```shell
+```bash
 192.168.X.X:/mnt/<pool>/<dataset> /mnt/immich-v2 nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
 ```
 
@@ -170,27 +170,27 @@ Add to the bottom of the file
 Now that we're all set up it's finally time to install Immich.
 
 Create a directory for the Docker files
-```shell
+```bash
 mkdir ~/immich-app
 ```
 
 Navigate to the new directory
-```shell
+```bash
 cd ~/immich-app
 ```
 
 Download the Docker Compose file
-```shell
+```bash
 wget https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
 ```
 
 Download the .env file
-```shell
+```bash
 wget -O .env https://github.com/immich-app/immich/releases/latest/download/example.env
 ```
 
 Download the hardware acceleration file (optional)
-```shell
+```bash
 wget https://github.com/immich-app/immich/releases/latest/download/hwaccel.yml
 ```
 
@@ -205,13 +205,14 @@ Edit the .env file
 Since my Proxmox server is an Intel NUC with Quicksync, I'm going to pass that through to the VM so Immich can use it to transcode. If you aren't going to use Quicksync or don't have it available you can skip this part.
 
 Install some hardware packages
-```shell
+
+```bash
 sudo apt install --install-recommends linux-generic-hwe-22.04
 ```
 
 Download/install the Intel Compute-Runtime stuff
 Follow the steps on this page.
-```shell
+```bash
 https://github.com/intel/compute-runtime/releases
 ```
 
@@ -229,12 +230,12 @@ Once you're back in the VM, type
 You should see something like `renderD128` listed now.
 
 Go in to the Immich folder with the config files
-```shell
+```bash
 cd ~/immich-app
 ```
 
 Edit the `hwaccel` file
-```shell
+```bash
 nvim hwaccel.yml
 ```
 
@@ -260,7 +261,7 @@ immich-microservices:
 ---
 
 At this point the Immich server should be up and running and you should be able to log in/create the admin account by going to
-```shell
+```bash
 http://192.168.X.X:2283
 ```
 
@@ -271,17 +272,17 @@ The Intel NUC is a pretty great server, but I'm planning on throwing a bunch of 
 This computer didn't already have Docker installed so I followed the steps above for installing Docker/Docker Compose.
 
 Create a folder for the Docker Compose file
-```shell
+```bash
 mkdir -p ~/immich-ml && cd ~/immich-ml
 ```
 
 Create the compose file
-```shell
+```bash
 touch docker-compose.yml
 ```
 
 Edit the file
-```shell
+```bash
 nvim docker-compose.yml
 ```
 
@@ -302,8 +303,9 @@ services:
 volumes:
   model-cache:
 ```
+
 Save, exit and run the container
-```shell
+```bash
 sudo docker compose up
 ```
 
@@ -314,7 +316,7 @@ Open up the Immich web ui and log in as the administrator if you've already set 
 Once logged in as the administrator, click the `Administration` button at the top right and go to `Settings > Machine Learning Settings`
 
 In the URL textfield, put in the IP address of the machine running the `immich-machine-learning` container with the port `3003`.
-```shell
+```bash
 http://192.168.X.X:3003
 ```
 

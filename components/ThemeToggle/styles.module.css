@@ -6,8 +6,8 @@
 .themeToggleButton {
   font-size: var(--text-xs);
   border: none;
+}
 
-  &:hover {
-    color: var(--link-hover);
-  }
+.themeToggleButton:hover {
+  color: var(--link-hover);
 }

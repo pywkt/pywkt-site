@@ -4,9 +4,9 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
 
-  h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-  }
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
 }
