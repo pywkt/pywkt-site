@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import { compile, run } from '@mdx-js/mdx';
-import * as runtime from 'react/jsx-runtime';
+import * as jsxRuntime from 'react/jsx-runtime';
 import remarkGfm from 'remark-gfm';
 import { customComponents } from '@/config/customMDXComponents';
 import PostPage from '@/components/PostPage';
@@ -99,7 +99,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   );
 
   const { default: Content, data } = await run(code, {
-    ...runtime,
+    ...jsxRuntime,
     Fragment: 'div',
   });
 
