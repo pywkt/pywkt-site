@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import Script from 'next/script';
 import './preflight.css';
 import './globals.css';
 import Header from '@/components/Header';
@@ -72,10 +73,19 @@ export default function RootLayout({
   const cookieValue = cookies().get('theme')?.value || '';
   const isTheme = cookieValue === defaultTheme || cookieValue === 'dark';
   const theme: string = isTheme ? cookieValue : defaultTheme;
+  const isProd = process.env.NEXT_PUBLIC_IS_PROD === 'true';
+  console.log('isProd:', isProd);
 
   return (
     <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
       <body>
+        {isProd && (
+          <Script
+            defer
+            data-domain='pywkt.com'
+            src={process.env.NEXT_PUBLIC_PL_URL}
+          />
+        )}
         <Header />
         <div className={themeToggleContainer}>
           <ThemeToggle currentTheme={theme} />
