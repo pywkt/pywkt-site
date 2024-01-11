@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { compile, run } from '@mdx-js/mdx';
 
 const allMeta = async (file: string) => {
-  console.log('getPostMetadata:', `${process.cwd()}/posts/${file}`)
+  console.log('getPostMetadata:', `${process.cwd()}/posts/${file}`);
   const code = await compile(
     await fs.readFile(`${process.cwd()}/posts/${file}`),
     {
@@ -15,12 +15,14 @@ const allMeta = async (file: string) => {
   return data;
 };
 
+const isProd = process.env.NEXT_PUBLIC_IS_PROD === "true"
+
 // This is a bit wonky but it seems to work....
 export const getPostMetadata = async (fileList: string[]) =>
   Promise.all(fileList.map(async (post: string) => allMeta(post)));
 
 export const getAllFiles: (path: string) => Promise<string[]> = async (path) =>
-  fs.readdir(path);
+  fs.readdir(isProd ? `/vercel/path0/${path}` : path);
 
 export const getSinglePostMeta = async (file: string) =>
   await allMeta(`${file}.mdx`);
