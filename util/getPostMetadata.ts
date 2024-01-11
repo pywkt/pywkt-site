@@ -18,11 +18,15 @@ const allMeta = async (file: string) => {
 const isProd = process.env.NEXT_PUBLIC_IS_PROD === "true"
 
 // This is a bit wonky but it seems to work....
-export const getPostMetadata = async (fileList: string[]) =>
-  Promise.all(fileList.map(async (post: string) => allMeta(post)));
+export const getPostMetadata = async (fileList: string[]) => {
+  console.log('getPostMetadata:', fileList)
+ return Promise.all(fileList.map(async (post: string) => allMeta(post)));
+}
 
-export const getAllFiles: (path: string) => Promise<string[]> = async (path) =>
-  fs.readdir(isProd ? `/vercel/path0/${path}` : path);
+export const getAllFiles: (path: string) => Promise<string[]> = async (path) => {
+  console.log('getAllFiles:', `./${path}`)
+  return fs.readdir(`./${path}`)
+}
 
 export const getSinglePostMeta = async (file: string) =>
   await allMeta(`${file}.mdx`);
