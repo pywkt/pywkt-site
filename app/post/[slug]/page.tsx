@@ -9,8 +9,6 @@ import { cookies } from 'next/headers';
 import { Metadata } from 'next';
 import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
 
-export const runtime = 'edge';
-
 type Props = {
   params: { id: string; title: string; slug: string };
 };

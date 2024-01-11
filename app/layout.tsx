@@ -10,8 +10,6 @@ import { dankMonoReg } from '@/config/fonts';
 import Footer from '@/components/Footer';
 import styles from './layouts.module.css';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: 'pywkt',
   description: 'Various things are here',
