@@ -87,9 +87,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
     keepBackground: cookieValue === 'dark' ? true : true,
   };
 
-  console.log('post/[slug]', process.cwd());
+  // console.log('post/[slug]', process.cwd());
   const code = String(
-    await compile(await fs.readFile(`${process.cwd()}/posts/${params.slug}.mdx`), {
+    await compile(await fs.readFile(`./posts/${params.slug}.mdx`), {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [[rehypePrettyCode, options]],
       outputFormat: 'function-body',

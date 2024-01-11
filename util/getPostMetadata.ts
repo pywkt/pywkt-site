@@ -1,10 +1,11 @@
 import fs from 'node:fs/promises';
+import {path as dirPath} from 'node:path';
 import { compile, run } from '@mdx-js/mdx';
 
 const allMeta = async (file: string) => {
-  console.log('getPostMetadata:', `${process.cwd()}/posts/${file}`);
+  console.log('getPostMetadata:', `/posts/${file}`);
   const code = await compile(
-    await fs.readFile(`${process.cwd()}/posts/${file}`),
+    await fs.readFile(`./posts/${file}`),
     {
       outputFormat: 'function-body',
       development: false,
@@ -24,8 +25,8 @@ export const getPostMetadata = async (fileList: string[]) => {
 }
 
 export const getAllFiles: (path: string) => Promise<string[]> = async (path) => {
-  console.log('getAllFiles:', `./${path}`)
-  return fs.readdir(`./${path}`)
+  console.log('getAllFiles:', `${path}`)
+  return fs.readdir(`${process.cwd()}/${path}`)
 }
 
 export const getSinglePostMeta = async (file: string) =>
