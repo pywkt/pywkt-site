@@ -14,7 +14,7 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  const posts = await getAllFiles('posts');
+  const posts = await getAllFiles(process.cwd() + 'posts');
   return posts.map((post) => ({ slug: post.split('.')[0] }));
 }
 
