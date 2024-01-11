@@ -9,13 +9,15 @@ import { cookies } from 'next/headers';
 import { Metadata } from 'next';
 import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
 
+export const runtime = 'edge';
+
 type Props = {
   params: { id: string; title: string; slug: string };
 };
 
 export async function generateStaticParams() {
-  const posts = await getAllFiles('posts')
-  return posts.map(post => ({ slug: post.split('.')[0] }))
+  const posts = await getAllFiles('posts');
+  return posts.map((post) => ({ slug: post.split('.')[0] }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
