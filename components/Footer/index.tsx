@@ -11,8 +11,6 @@ export default function Footer() {
         <span> | </span>
         <span> {siteInfo.siteDescription}</span>
       </p>
-      {/* <p>|</p> */}
-      {/* <p className='font-ital'>a collection of notes</p> */}
       <p className={footerLinks}>
         {siteInfo.social.map((i) => (
           <Link
