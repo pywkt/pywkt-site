@@ -78,13 +78,13 @@ export default function RootLayout({
   return (
     <html lang='en' className={`${dankMonoReg.className} ${theme}`}>
       <body>
-        {isProd && (
-          <Script
-            defer
-            data-domain='pywkt.com'
-            src={process.env.NEXT_PUBLIC_PL_URL}
-          />
-        )}
+        {/* {isProd && ( */}
+        {/*   <Script */}
+        {/*     defer */}
+        {/*     data-domain='pywkt.com' */}
+        {/*     src={process.env.NEXT_PUBLIC_PL_URL} */}
+        {/*   /> */}
+        {/* )} */}
         <Header />
         <div className={themeToggleContainer}>
           <ThemeToggle currentTheme={theme} />
