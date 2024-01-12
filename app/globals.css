@@ -52,7 +52,9 @@ h6 {
 }
 
 hr {
-  border-color: var(--border-hr);
+  border: none;
+  border-bottom: 1px solid;
+  border-bottom-color: var(--border-hr);
 }
 
 a {
