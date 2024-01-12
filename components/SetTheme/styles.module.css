@@ -1,0 +1,13 @@
+.themeToggleHr {
+  width: 2rem;
+  border-color: var(--border-hr);
+}
+
+.themeToggleButton {
+  font-size: var(--text-xs);
+  border: none;
+}
+
+.themeToggleButton:hover {
+  color: var(--link-hover);
+}

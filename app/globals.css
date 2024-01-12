@@ -9,7 +9,7 @@
   --text-xl: 1.5rem;
 }
 
-.dark {
+:root[data-theme="dark"] {
   --foreground: #e0fbfc;
   --background: #293241;
   --border-hr: #233f4a;

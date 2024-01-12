@@ -1,5 +1,5 @@
 // import { cookies } from 'next/headers';
-// import Script from 'next/script';
+import Script from 'next/script';
 import './preflight.css';
 import './globals.css';
 import Header from '@/components/Header';
@@ -9,6 +9,15 @@ import { dankMonoReg } from '@/config/fonts';
 import Footer from '@/components/Footer';
 import styles from './layouts.module.css';
 import { siteMetadata } from './siteMetadata';
+import { getTheme } from '@/util/getTheme';
+import dynamic from 'next/dynamic';
+
+// const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), {
+//   ssr: false,
+// });
+const SetTheme = dynamic(() => import('@/components/SetTheme'), {
+  ssr: false,
+});
 
 export const metadata = siteMetadata;
 
@@ -32,6 +41,12 @@ export default function RootLayout({
 
   return (
     <html lang='en' className={`${dankMonoReg.className}`}>
+      <head>
+        <Script
+          id='themeToggle'
+          dangerouslySetInnerHTML={{ __html: getTheme }}
+        />
+      </head>
       <body>
         {/* {isProd && ( */}
         {/*   <Script */}
@@ -43,6 +58,8 @@ export default function RootLayout({
         <Header />
         <div className={themeToggleContainer}>
           {/* <ThemeToggle currentTheme={theme} /> */}
+          {/* <ThemeToggle /> */}
+          <SetTheme />
         </div>
 
         <div className={pageGrid}>
