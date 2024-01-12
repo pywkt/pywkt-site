@@ -15,7 +15,6 @@ export const images = {
         href={`${process.env.NEXT_PUBLIC_CF_IMG}${src}`}
         style={{ position: 'relative', width: '200px', height: '200px' }}
       >
-        {/* <img src={`${process.env.NEXT_PUBLIC_CF_IMG}${src}`} alt={alt} /> */}
         <Image
           loader={imageLoader}
           src={`${process.env.NEXT_PUBLIC_CF_IMG}/${src}`}
