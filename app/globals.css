@@ -51,6 +51,10 @@ h6 {
   font-size: 0.6rem;
 }
 
+hr {
+  border-color: var(--border-hr);
+}
+
 a {
   transition: color 150ms;
 
