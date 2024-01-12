@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --foreground: #1d3557;
   --background: #fbf9f1;
   --border-hr: #e5e1da;
@@ -9,7 +10,8 @@
   --text-xl: 1.5rem;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
+  color-scheme: dark;
   --foreground: #e0fbfc;
   --background: #293241;
   --border-hr: #233f4a;
@@ -64,7 +66,7 @@ time {
 }
 
 p {
-  font-size: var(--text-sm)
+  font-size: var(--text-sm);
 }
 
 html {
