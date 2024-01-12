@@ -1,4 +1,6 @@
-export const postMetadata = (postMeta: any) => {
+import { Metadata } from "next";
+
+export const postMetadata = (postMeta: any):Metadata => {
   return {
     title: {
       default: 'pywkt.com',

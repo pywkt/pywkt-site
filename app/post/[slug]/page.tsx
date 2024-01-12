@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { customComponents } from '@/config/customMDXComponents';
 import PostPage from '@/components/PostPage';
 import rehypePrettyCode from 'rehype-pretty-code';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
 import { postMetadata } from './postMetadata';
 import { Metadata } from 'next';
 import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
@@ -22,18 +22,18 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: MetadataProps): Promise<Metadata> {
-  const postMeta: any = await getSinglePostMeta(params.slug);
+  const postMeta = await getSinglePostMeta(params.slug);
   const meta = postMetadata(postMeta);
 
   return meta;
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
-  const cookieValue = cookies().get('theme')?.value || '';
+  // const cookieValue = cookies().get('theme')?.value || '';
 
   const options = {
-    theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
-    // theme: 'material-theme',
+    // theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
+    theme: 'material-theme',
     defaultLang: {
       block: 'javascript',
       inline: 'shell',
@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     tokensMap: {
       txt: 'entity.name.',
     },
-    keepBackground: cookieValue === 'dark' ? true : true,
+    // keepBackground: cookieValue === 'dark' ? true : true,
   };
 
   // console.log('post/[slug]', process.cwd());
