@@ -19,7 +19,7 @@ const SetTheme = () => {
   return (
     <>
       <button onClick={toggleTheme} className={themeToggleButton}>
-        {isDark ? 'dark' : 'light'}
+        {isDark ? 'light' : 'dark'}
       </button>
       <hr className={themeToggleHr} />
     </>
