@@ -5,7 +5,6 @@ import remarkGfm from 'remark-gfm';
 import { customComponents } from '@/config/customMDXComponents';
 import PostPage from '@/components/PostPage';
 import rehypePrettyCode from 'rehype-pretty-code';
-// import { cookies } from 'next/headers';
 import { postMetadata } from './postMetadata';
 import { Metadata } from 'next';
 import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
@@ -29,8 +28,6 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
-  // const cookieValue = cookies().get('theme')?.value || '';
-
   const options = {
     // theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
     theme: 'material-theme',
@@ -44,7 +41,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
     // keepBackground: cookieValue === 'dark' ? true : true,
   };
 
-  // console.log('post/[slug]', process.cwd());
   const code = String(
     await compile(await fs.readFile(`./posts/${params.slug}.mdx`), {
       remarkPlugins: [remarkGfm],

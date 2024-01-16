@@ -21,6 +21,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isProd = process.env.NEXT_PUBLIC_IS_PROD === 'true';
   const {
     leftSpacerGrid,
     mainContentContainer,
@@ -38,13 +39,13 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* {isProd && ( */}
-        {/*   <Script */}
-        {/*     defer */}
-        {/*     data-domain='pywkt.com' */}
-        {/*     src={process.env.NEXT_PUBLIC_PL_URL} */}
-        {/*   /> */}
-        {/* )} */}
+        {isProd && (
+          <Script
+            defer
+            data-domain='pywkt.com'
+            src={process.env.NEXT_PUBLIC_PL_URL}
+          />
+        )}
         <Header />
         <div className={themeToggleContainer}>
           <SetTheme />
