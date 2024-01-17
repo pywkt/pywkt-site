@@ -1,3 +1,5 @@
+// https://github.com/vercel/next.js/discussions/53063
+
 const code = function () {
   window.__onThemeChange = function () {};
 
