@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <div className={footer}>
       <p className={footerTitle}>
-        <Link href="/">pywkt</Link>
+        <Link href="/">{siteInfo.title}</Link>
         <span> | </span>
         <span> {siteInfo.siteDescription}</span>
       </p>

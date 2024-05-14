@@ -12,7 +12,7 @@ const allMeta = async (file: string) => {
   return data;
 };
 
-// // This is a bit wonky but it seems to work....
+// This is a bit wonky but it seems to work....
 export const getPostMetadata = async (fileList: string[]) => {
   return Promise.all(fileList.map(async (post: string) => allMeta(post)));
 };
