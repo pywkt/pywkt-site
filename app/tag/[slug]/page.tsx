@@ -1,3 +1,4 @@
+import { Post } from "@/components/AllPosts";
 import ListPost from "@/components/ListPost";
 import { getAllFiles, getPostMetadata } from "@/util/getPostMetadata";
 import { getAllTags } from "@/util/getTags";
@@ -14,19 +15,19 @@ export default async function TagPage({
   params: { slug: string };
 }) {
   const allFiles = await getAllFiles("posts");
-  const postData = await getPostMetadata(allFiles);
-  const matchingPosts = postData.filter((post: any) =>
+  const postData = (await getPostMetadata(allFiles)) as Post[];
+  const matchingPosts = postData.filter((post) =>
     post.tags.includes(params.slug),
   );
 
   const sortedPosts = matchingPosts.sort(
-    (a: any, b: any) => Date.parse(b.date) - Date.parse(a.date),
+    (a, b) => Date.parse(b.date) - Date.parse(a.date),
   );
 
   return (
     <div>
       <ul>
-        {sortedPosts.map((post: any) => (
+        {sortedPosts.map((post) => (
           <li key={post.title}>
             <ListPost post={post} />
           </li>
