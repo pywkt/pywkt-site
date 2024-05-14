@@ -71,6 +71,10 @@ time {
   font-size: 0.75rem;
 }
 
+.postDate {
+  font-size: 0.75rem;
+}
+
 p {
   font-size: var(--text-sm);
 }

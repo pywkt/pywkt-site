@@ -1,10 +1,12 @@
-import Link from 'next/link';
-import { getAllTags } from '@/util/getTags';
-import styles from './styles.module.css';
+import Link from "next/link";
+import { getAllTags } from "@/util/getTags";
+import styles from "./styles.module.css";
 
 export default async function TagList() {
   const { tagListUl } = styles;
-  const uniqueTags = await getAllTags('posts');
+  const uniqueTags = await getAllTags("posts");
+
+  if (!uniqueTags) return null;
 
   return (
     <ul className={tagListUl}>

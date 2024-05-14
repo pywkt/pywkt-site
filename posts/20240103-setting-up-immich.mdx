@@ -4,6 +4,7 @@ slug: "20240103-setting-up-immich",
 author: "pywkt",
 description: "Step by step instructions on how to get up and running with Immich on a Proxmox VM. I'll also set up machine learning to be offloaded to another machine and use Intel Quicksync for video transcoding.",
 date: "2024/01/03",
+lastUpdated: "2024/05/14",
 tags: ["proxmox", "immich", "photos", "ubuntu"]
 }
 
@@ -19,13 +20,15 @@ setting up each service one by one, so that means I'll be doing this in a VM. I 
 
 
 
-Create a new VM in Proxmox, I'm using Ubuntu 22.04, 4 cores, 4GB of ram and 24GB HDD.
+#### Create a new VM in Proxmox [<sup>(ref)</sup>](/post/20240514-creating-a-vm-in-proxmox)
+
+I'm using Ubuntu 22.04, 4 cores, 4GB of ram and 24GB HDD.
 
 Once that's up and running go through the install process. When it asks if you want any packages pre installed, don't select any, just skip through.
 
 Now you should be logged in and in the terminal.
 
-Update the system
+#### Update the system
 
 ```bash
 sudo apt update && sudo apt upgrade
@@ -38,7 +41,7 @@ Install some quality-of-life packages
 sudo apt install neovim zsh
 ```
 
-Install oh-my-zsh
+#### Install oh-my-zsh
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"

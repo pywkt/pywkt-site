@@ -1,28 +1,29 @@
-import fs from 'node:fs/promises';
-import { compile, run } from '@mdx-js/mdx';
-import * as jsxRuntime from 'react/jsx-runtime';
-import remarkGfm from 'remark-gfm';
-import { customComponents } from '@/config/customMDXComponents';
-import PostPage from '@/components/PostPage';
-import rehypePrettyCode from 'rehype-pretty-code';
-import { postMetadata } from './postMetadata';
-import { Metadata } from 'next';
-import { getSinglePostMeta, getAllFiles } from '@/util/getPostMetadata';
+import fs from "node:fs/promises";
+import { compile, run } from "@mdx-js/mdx";
+import * as jsxRuntime from "react/jsx-runtime";
+import remarkGfm from "remark-gfm";
+import { customComponents } from "@/config/customMDXComponents";
+import PostPage from "@/components/PostPage";
+import rehypePrettyCode from "rehype-pretty-code";
+import { postMetadata } from "./postMetadata";
+import { Metadata } from "next";
+import { getSinglePostMeta, getAllFiles } from "@/util/getPostMetadata";
+import { Post } from "@/components/AllPosts";
 
 type MetadataProps = {
   params: { id: string; title: string; slug: string };
 };
 
 export async function generateStaticParams() {
-  const posts = await getAllFiles('posts');
-  return posts.map((post) => ({ slug: post.split('.')[0] }));
+  const posts = await getAllFiles("posts");
+  return posts.map((post) => ({ slug: post.split(".")[0] }));
 }
 
 export async function generateMetadata({
   params,
 }: MetadataProps): Promise<Metadata> {
   const postMeta = await getSinglePostMeta(params.slug);
-  const meta = postMetadata(postMeta);
+  const meta = postMetadata(postMeta as Post);
 
   return meta;
 }
@@ -30,13 +31,13 @@ export async function generateMetadata({
 export default async function Page({ params }: { params: { slug: string } }) {
   const options = {
     // theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
-    theme: 'material-theme',
+    theme: "material-theme",
     defaultLang: {
-      block: 'javascript',
-      inline: 'shell',
+      block: "javascript",
+      inline: "shell",
     },
     tokensMap: {
-      txt: 'entity.name.',
+      txt: "entity.name.",
     },
     // keepBackground: cookieValue === 'dark' ? true : true,
   };
@@ -45,18 +46,21 @@ export default async function Page({ params }: { params: { slug: string } }) {
     await compile(await fs.readFile(`./posts/${params.slug}.mdx`), {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [[rehypePrettyCode, options]],
-      outputFormat: 'function-body',
+      outputFormat: "function-body",
       development: false,
     }),
   );
 
   const { default: Content, data } = await run(code, {
     ...jsxRuntime,
-    Fragment: 'div',
+    Fragment: "div",
   });
 
   return (
-    <PostPage content={<Content components={customComponents} />} data={data} />
+    <PostPage
+      content={<Content components={customComponents} />}
+      data={data as Post}
+    />
   );
 }
 

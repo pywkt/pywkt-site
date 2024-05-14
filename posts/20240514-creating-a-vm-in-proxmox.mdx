@@ -1,0 +1,111 @@
+export const data = {
+title: "Creating a VM in Proxmox",
+slug: "20240514-creating-a-vm-in-proxmox",
+author: "pywkt",
+description: "How to download, install and set up an Ubuntu Server virtual machine in Proxmox", 
+date: "2024/05/14",
+tags: ["proxmox", "ubuntu"]
+}
+
+If you're using Proxmox already or just starting to look in to whether or not you should, you'll most likely be interested in creating virtual machines. I mean, that's pretty much what Proxmox is; a tool for creating and managing virtual environments.
+
+---
+
+My Proxmox setup is currently using version 7.4-17 because I just haven't gotten around to upgrading to 8, so these instructions may differ a bit if you're on the latest version, but the idea is the same.
+
+> Note to self: Upgrade Proxmox
+
+Basically what we're going to do is download an .iso file of a Linux distribution, create a virtual machine in Proxmox that will install the distro and then let us log in to that container and use it as a complete isolated Linux system on our network.
+
+Good to know: Virtual machines and LXC containers are not the same. Personally I prefer to use an LXC for everything I can, but sometimes you just need a full Linux system and an LXC won't cut it.
+
+---
+
+I usually use Ubuntu Server because it's simple, requires minimal setup and there's a _ton_ of support/info about how to fix any problems you might run in to.
+
+#### Download the ISO
+Download the ISO file and save it somewhere on your computer. It'll be about 3 gigabytes, just FYI
+
+The latest version at the time of writing this is `24.04 LTS` so that's what I'll be downloading.
+
+```bash
+https://ubuntu.com/download/server
+```
+
+
+#### Find the storage device to install the ISO to
+
+> My left-hand sidebar is set to "Folder View". So for this guide I'll be referring to options that are shown when on that view.
+
+Open up the Proxmox GUI in your browser and select the Datacenter option from the menu on the left-hand side and click the Storage option. You should see a list of the available storage options connected to your Proxmox instance.
+
+In the Content column you should see some different options that tell you what each storage device can accept. Find one that has `ISO Image` listed.
+
+If you don't see any that specify `ISO Image`, you can edit them by double clicking and selecting `ISO Image` from the Content dropdown in the Edit window that pops up.
+
+Now that we know which one can hold our ISO image we can upload our Ubuntu ISO to that storage location.
+
+#### Upload the ISO
+In the left hand side select Storage and then the disk that can accept ISO images.
+
+Click "ISO Images" and click the Upload button
+
+Select the ISO file we just downloaded and click Upload
+
+Once it's done you should see it listed.
+
+#### Create new VM
+
+Click the "Create VM" button at the top of the Proxmox GUI
+
+The options below are only the settings I change. If something isn't listed here it means 99% of the time I leave it as whatever Proxmox sets as the default.
+
+__General__
+- Give the VM a name
+
+__OS__
+- Choose the storage location that we just uploaded the ISO to (if it's not already selected)
+- Select the ISO image we just uploaded from the ISO Image dropdown
+
+__System__
+- No changes
+
+__Disks__
+- Storage: Where the data inside the VM will be located.
+- Disk Size: How big to allocate to the VM. You can think of this like the harddrive that's inside the computer. I usually try to keep it as small as possible, but it really depends on what you're going to be using the VM for. The default on mine is 32GiB so I'll keep it at that.
+
+__CPU__
+- Cores: I usually set this to either 2 or 4 and I basically think of this as "how many threads of the CPU do I want this VM to be able to use"
+- Good to know: Let's say your CPU has 4 cores, you can create multiple VMs with 4 cores because they are all sharing the same "core pool". You'll run in to problems if all your 4 core VMs need 100% of all 4 cores at the same time, but generally it should be fine.
+
+__Memory__
+- This also depends on what you'll be running in the VM. I usually only use VMs for Docker and Docker seems to use a decent amount of RAM.
+- A general rule of thumb that I use is to allocate a minimum of 1GiB of memory for each Docker container I will be running in the VM and 2Gib for the VM itself.
+- I don't think it _really_ matters, but I always use multiples of 1024 when allocating RAM (1024 = 1Gib / 2048 = 2GiB / 4096 = 4Gib)
+
+__Network__
+- No changes
+
+__Confirm__
+- Click the Finish button if you're satisfied with the options
+- You can always delete the VM and try again if something goes wrong
+
+#### Running the VM
+Once Proxmox is done setting up the VM you should see it appear under the Virtual Machine option in the left-hand sidebar.
+
+- Select the new VM and click the Start button at the top of the screen
+- Click the Console button to open up a virtual terminal to the new VM
+
+After this you'll need to go through the Ubuntu Server setup just like you normally would when setting up a Linux distro on any computer. It's all pretty self explanatory: set your locale/time/etc. Create a user with a password so you can login. 
+
+Leave the storage as the defaults because we set all that up in Proxmox already so it only has access to what we defined when creating the VM.
+
+Once Ubuntu is installed, it will reboot and you may run in to an issue where it either says it can't find the operating system or it tries to re-install. If this happens:
+
+- Stop the VM by clicking the Shutdown or Stop button at the top of the Proxmox GUI (with the VM selected)
+- Select the Hardware option for the VM
+- Double click the CD/DVD Drive option
+- Select the "Do not use any media" option
+- Start the VM again
+
+Now it should boot to a terminal login screen where you can enter the username/password you created while going through the Ubuntu setup
