@@ -14,7 +14,11 @@ const PostComments = ({ title }: { title: string }) => {
 
   return (
     <div>
-      <button type="button" onClick={() => setShowComments((prev) => !prev)}>
+      <button
+        type="button"
+        onClick={() => setShowComments((prev) => !prev)}
+        style={{ border: 0 }}
+      >
         &gt; Comments
       </button>
       {showComments && (

@@ -48,3 +48,15 @@ Remove the `components/PostComments` directory and the corresponding import in `
 ---
 
 See the `posts` directory for examples on how to format posts.
+
+A "post" is an `mdx` file with a `data` object on line 1.
+```js
+export const data = {
+    title: string,
+    slug: string,    // The exact name of the MDX file without the extension.
+    author: string,
+    description: string,
+    date: string,    // year-month-day eg: "2024-05-22",
+    tags: string[]
+}
+```
