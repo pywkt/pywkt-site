@@ -1,0 +1,150 @@
+export const data = {
+title: "NIP-05 Verification on Nostr with Cloudflare and a Custom Domain",
+slug: "20240703-nip05-verification-nostr-cloudflare",
+author: "pywkt",
+description: "", 
+date: "2024/07/03",
+tags: ["nostr", "cloudflare"]
+}
+
+This week I decided to give [Nostr](https://nostr.com) an honest shot and while I'm still not _totally_ hooked, 
+I can definitely see how this could be a really great tool if everything pans out for it. 
+One part of the protocol I find interesting is the idea of [NIPS](https://github.com/nostr-protocol/nips) 
+and how the spec is set up to be expanded on as new ideas/technologies come about. 
+NIP-01 is your basic text note. Pretty much all the Twitter clones you stumble upon while trying 
+to figure out what the hell Nostr even is are basically just a shitload of NIP-01s being mapped through. 
+NIP-05 is how you can "verify" who you are on these various sites. That's what we'll be setting up now.
+
+---
+
+Requirements:
+- Cloudflare account
+- Custom domain managed by Cloudflare
+
+> You don't have to purchase the domain on Cloudflare, but CF should be managing the DNS records.
+
+There's a lot of different sites (apps) that will get you set up with public/private Nostr keys, but 
+I'm using [primal.net](https://primal.net) for this example. It should pretty much be the same 
+wherever you get your keys.
+
+### Getting the keys
+Go to [https://primal.net](https://primal.net/home) and click the Get Started button.
+
+Create an account
+	- Pick an "@" username
+	- Enter a display name
+	- Click Next
+	- Fill out whatever info you want, but skip the NIP-05 textfield for now
+
+Primal will "find" some accounts for you to follow. I made the mistake of allowing this and now my feed 
+is 99% BTC bros pissing their pants about fake internet money. Don't get me wrong, I love cryptocurrency
+with all my heart, but damn.
+
+Click Finish
+
+It'll ask you to set up your pin next. It looks like the site is using localstorage to store the public 
+key and if that's present it'll just ask to enter your pin when you come back instead of having to enter 
+your private key.
+
+Set a pin
+
+Side-note: While going through this I guess I took too long and something timed-out. When I hit submit 
+an error saying "Invalid username" popped up. I refreshed the page and *surprise!* I'm now following 
+176 Bitcoin twats even though I hit the "Unfollow All" button. Also my username didn't show up, 
+but I just went in to the settings and updated that, now we're all good.
+
+Onward...
+
+Go to Settings > Account
+
+Copy your public key and private key somewhere safe like a secure note in a password manager. **Don't lose these**.
+
+### Prepare the files for NIP-05
+
+Somewhere on your computer create a folder called `.well-known`
+Notice there is a period (.) at the start. This means it'll be a hidden folder. Make sure you're able to view hidden files.
+
+Inside the folder make two files: `nostr.json` and `_config.yml`
+
+The `nostr.json` file requires your public key in HEX format. Go to [damus.io/key](https://damus.io/key) and put your PUBLIC key in the top textbox. The bottom textbox should populate with a hex string. Copy that hex.
+
+Inside `nostr.json` put the following:
+```json
+{
+  "names": {
+    "<the-name-you-want>": "<PUBLIC_KEY_HEX>"
+  }
+}
+```
+
+Example:
+```json
+{
+  "names": {
+    "pywkt": "4radad637fhf......"
+  }
+}
+```
+
+Save the file.<br/><br/>
+
+Inside `_config.yml` put the following:
+
+```yml
+include:
+  - .well-known
+```
+
+Save the file.<br/><br/>
+
+Now put the `.well-known` folder in a .zip file. You can name it whatever you want. I just named mine `nostr.zip`. Make sure the `.well-known` directory is at the top-level of the zip file.
+
+### Putting it on Cloudflare
+
+#### Upload to Pages
+Log in to your CF account and go to the Workers & Pages section
+
+Click the Create button
+
+Select the Pages tab at the top of the page.
+
+There should be two options, select the Upload Assets one.
+
+Give it a name and click the Create Project button.
+
+The upload section should be enabled now. Upload the zip file that has the `.well-known` directory.
+
+Click the Deploy Site button.
+
+#### Set custom domain
+Go back to the Workers & Pages tab and select the project you just created
+
+Click the Custom Domains tab at the top
+
+Enter the subdomain you want your verification to be located at.
+  - You must choose a domain you already have in Cloudflare
+  - I'm just choosing `nostr.pywkt.com`
+
+Click the Continue button.
+
+Once it's done adding the DNS records you should be all set here.
+
+### Verification on Primal
+
+Go back to [primal.net](https://primal.net/home) and click your account name in the lower left corner.
+
+Click the Edit Profile button
+
+In the textbox that says "Verified Nostr Address (NIP-05)" enter the subdomain you just created. For me it'll be `pywkt@nostr.pywkt.com` because `pywkt` was the name I put in my `nostr.json` file and `nostr.pywkt.com` was the subdomain I set up on Cloudflare.
+
+Click Save and refresh the page.
+
+You should now see a checkmark next to your name on primal.net.
+
+---
+
+__Bonus:__ You can also set your name to an underscore ( _ ) in your `nostr.zip` and then 
+use `_@<subdomain>` when setting up verification and it will only show the subdomain. So instead 
+of showing `pywkt@nostr.pywkt.com` on primal.net it'll just show up as `nostr.pywkt.com`. Looks a 
+bit cleaner in my opinion.
+
