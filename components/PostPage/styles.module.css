@@ -16,6 +16,12 @@
   margin-bottom: 1rem;
 }
 
+.post ol {
+  list-style: auto;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
 .post blockquote {
   margin: 1.6rem 0rem;
   padding-left: 1rem;

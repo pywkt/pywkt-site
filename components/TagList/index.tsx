@@ -10,7 +10,7 @@ export default async function TagList() {
 
   return (
     <ul className={tagListUl}>
-      {uniqueTags.map((tag: string) => (
+      {uniqueTags.sort().map((tag: string) => (
         <li key={tag}>
           <Link href={`/tag/${tag}`}>{tag}</Link>
         </li>

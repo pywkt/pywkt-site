@@ -1,0 +1,83 @@
+export const data = {
+title: "Introducing zero_carbs",
+slug: "20241016-introducing-zero-carbs",
+author: "pywkt",
+description: "I made an app called zero_carbs. It's a self-hosted, private, inventory/sales tracker because spreadsheets are trash.", 
+date: "2024/10/16",
+tags: ["self-hosting", "zero_carbs", "apps"]
+}
+
+This past year I've been selling a decent amount of stuff on Ebay and eventually it got to the point where I needed a way to track some data.
+
+  - Amount I was spending
+  - Amount earned
+  - Tax, fees etc
+  - Inventory
+      - Source (garage sale, estate sale etc)
+      - Listed (ebay, marketplace, etc)
+      - Sold (price, time to sell, etc)
+
+Seems pretty simple, and if you look around the internet, you'll see an overwhelming amount of "Just use Google Docs" type of nonsense.
+
+Yeah no. 
+
+1. I'm not going to be logging in to a Google account every time I buy/sell something. 
+
+2. I don't know how to use Google Docs.
+
+Like at all. Still to this day I don't understand how to interact with all the little cells. What happens when I click? How do I add text? Why does the cell stretch over the next cell if I put a lot of text in? Do I double click? Ever? Drag? And lets not even get started on "linking" or doing maths and equations on cells. I have no idea and I'm getting annoyed just writing this.
+
+---
+
+<div style={{maxWidth: '800px', margin: '0 auto'}}>
+![zero_carbs](/images/posts/zero-carbs/dashboards.png)
+</div>
+
+__zero_carbs__: because spreadsheets can eat shit and die.
+
+Here's how it works:
+
+1. I go to estate/garage sales and I buy various items.
+2. When I get home I make a new Purchase in zero_carbs and add all the items I just bought and the total price.
+3. Eventually when I put an item up for sale on Ebay, I make a new listing in zero_carbs and add all the items that are for sale in the listing.
+4. When the item sells, I mark the Listing as sold and add the totals.
+
+It's that simple.
+
+What I think sets zero_carbs apart from other apps/spreadsheet formats is that __tracking starts with the <u>purchase</u>__. The individual items _in_ the purchase are irrelevant. This is because often times I'll be at a sale and have something like 10 different things I'm buying. When I get to the register they're like, "How about $20 for everything?" and I say "Sure". Now, how am I supposed to track all the items in that purchase? Do I divide the number of items in to 20 and get an "individual" price for each one? That seems silly. By starting the tracking process from the __purchase__ it's so much simpler.
+
+<div style={{maxWidth: '400px', margin: '0 auto'}}>
+![zero_carbs](/images/posts/zero-carbs/01.png)
+</div>
+
+Often times I don't bother listing anything for several weeks. Months even. But once I decide to sell some things, I just click the Add Listing button, select the items I'm selling and I'm done.
+
+<div style={{maxWidth: '400px', margin: '0 auto'}}>
+![zero_carbs](/images/posts/zero-carbs/02.png)
+</div>
+
+The great thing about this system is that I can __mix and match items from different purchases__ in my listings. When the listing sells, the items in each purchase get marked as sold and the price gets updated.
+
+<div style={{margin: '0 auto'}}>
+[![zero_carbs](/images/posts/zero-carbs/05.png)](/images/posts/zero-carbs/03.png)
+</div>
+
+And that's pretty much it. There's a decent little dashboard with some basic info.
+
+<div style={{margin: '0 auto'}}>
+![zero_carbs](/images/posts/zero-carbs/04.png)
+</div>
+
+Oh and I forgot the best part, it's 100% open source and free for everyone.
+
+I assume if you've read this blog before you're familiar with self-hosting so here's the link:
+
+[https://github.com/zero-carbs/zero_carbs_docker](https://github.com/zero-carbs/zero_carbs_docker)
+
+This is the first time I've ever bundled up a web app with Docker, so let me know if there's any issues/if it even works. One caveat: It requires an account with Clerk for auth. Sorry, but that's just the way it is for now. I use Clerk for pretty much everything and I _could_ take it out for the self-hosted version, but I also don't want to maintain multiple code bases of the same app. Sooooo, Clerk it is.
+
+If you're not in to self-hosting and just want a simple and quick way to get up and running, I set up a fully hosted version for $3.99/mo. There's a two-week trial period, but unfortunately the way I had to set up Square for payments required me to make the user provide a credit card number in advance. I'm not a fan of this practice, but alas, such is the world we live in.
+
+Anyway, if you're in to reselling, flipping, whatever, check it out...
+
+[https://zerocarbs.app](https://zerocarbs.app)
