@@ -1,5 +1,3 @@
-// Todo: Add button to copy code to clipboard.
-
 export const codeBlocks = {
   figure: ({
     children,
