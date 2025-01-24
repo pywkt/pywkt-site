@@ -4,13 +4,17 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies first (better caching)
 COPY package*.json ./
-RUN npm config set registry http://registry.npmjs.org/
-RUN npm ci
+RUN npm config set registry http://registry.npmjs.org/ && \
+    npm config set strict-ssl false && \
+    npm install
 
-# Copy all files
+# Copy the rest of the application
 COPY . .
+
+# Set PATH for node_modules/.bin
+ENV PATH /app/node_modules/.bin:$PATH
 
 # Build the application
 RUN npm run build
@@ -20,9 +24,7 @@ FROM nginx:alpine
 
 # Copy built assets from builder stage
 COPY --from=builder /app/out /usr/share/nginx/html
-
-# Copy custom nginx config if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
