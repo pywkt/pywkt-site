@@ -4,20 +4,21 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install dependencies first (better caching)
-COPY package*.json ./
+# Install dependencies first
+COPY package.json package-lock.json ./
 RUN npm config set registry http://registry.npmjs.org/ && \
     npm config set strict-ssl false && \
-    npm install
+    npm install --include=dev
 
 # Copy the rest of the application
 COPY . .
 
-# Set PATH for node_modules/.bin
-ENV PATH /app/node_modules/.bin:$PATH
+# Explicitly install next
+RUN npm install next
 
 # Build the application
-RUN npm run build
+RUN node_modules/.bin/next build && \
+    node_modules/.bin/next-sitemap
 
 # Production stage
 FROM nginx:alpine
