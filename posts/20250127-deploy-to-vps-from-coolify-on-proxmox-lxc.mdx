@@ -1,0 +1,515 @@
+export const data = {
+title: "Self host Coolify on a Proxmox LXC and Deploy to a Remote VPS Securely",
+slug: "20250127-deploy-to-vps-from-coolify-on-proxmox-lxc",
+author: "pywkt",
+description: "Step by step instructions on how to deploy Coolify on a Proxmox LXC, set up deployments to a VPS and secure everything with Tailscale and no open SSH ports.", 
+date: "2025/01/27",
+tags: ["self-hosting", "coolify", "tailscale"]
+}
+
+When I first went to set up Coolify, I found it very surprising that all the guides/videos I came across only had instructions to set up the Coolify dashboard on the same server as the sites/services it'll be hosting. This seemed strange to me considering it says right on the onboarding page:
+
+> _"It is not recommended to use one server for everything."_
+
+So for this guide we'll be setting up the Coolify instance on an LXC in a self hosted Proxmox node and then setting it up to deploy to our VPS. This way the VPS can simply act as a web server and Coolify can be cool.
+
+One common plague with running a VPS is getting slammed by bots hitting your SSH port trying to get a quick win. In this guide we'll be using Tailscale SSH which will allow us to turn off SSH on the VPS completely. We'll only open the ports needed to host our services.
+
+One thing to note: Unfortunately, this guide will set everything up on the root account on all the servers. Coolify claims you can manage as a non-root user, but for the life of me I couldn't figure out how to get it working. It's not the end of the world since the only public facing server is the VPS and we'll have our ports locked down, but still. I just wanted to mention that before starting. If you're reading this and managed to get everything working on a non-root account, please hit me up either on [Github](https://github.com/pywkt), [Gitlab](https://gitlab.com/pywkt) or [Reddit](https://reddit.com/u/pywkt) so we can talk.
+
+> __Note:__ This post got pretty lengthy so I split the section on setting up a build server to [here](/post/20250128-set-up-a-local-build-server-on-proxmox-for-coolify)
+
+---
+
+If you want to follow along, these are the things we'll be using:
+1. Proxmox node where we will create the LXC to host Coolify
+2. VPS that will be our web server.
+3. Tailscale account
+4. Domain name (optional)
+5. Cloudflare account to manage DNS (optional)
+
+There's a lot of steps to setting this up, but I'll try to make it as simple as possible. And if you've read any of my other posts you may have realized I'm not a fan of bothering with screenshots. Just dense text ready to copy and paste.
+
+Let's get started...
+
+---
+
+## VPS
+
+It doesn't really matter where your VPS is hosted, just as long as it has enough resources to handle whatever you're hosting and you can log in as root.
+
+I'll be using a VPS with a fresh install of Debian 12 (bookworm). 
+
+#### SSH in to the VPS as root
+```shell
+ssh root@<your-vps-ip>
+```
+
+#### Update the system
+```shell
+apt update && apt upgrade
+```
+
+#### Reboot
+```shell
+reboot now
+```
+
+#### Install some quality of life packages
+These are just the basic packages I always install when setting up a server. The important ones here are git, ufw and curl. If nothing else, install those.
+```shell
+apt install build-essential curl file git ufw zsh neovim git-core fonts-powerline
+```
+
+#### If you installed ZSH like in the command above, install oh-my-zsh now
+```shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+When it asks if you want to make ZSH the default shell, type `y`.
+
+#### Logout
+```shell
+logout
+```
+
+#### Reconnect to the VPS via SSH
+Your default shell should be zsh now. You can check by running
+```shell
+which $SHELL
+```
+And you should see something like `/usr/bin/zsh`
+
+Lets get this thing on Tailscale so we can turn on the firewall and lock it down.
+
+## Tailscale
+- Log in to your Tailscale account and click the __"Add device +"__ button within the __Machines__ section and select __Linux server__.
+- You can keep the default settings and click the __Generate install__ script button at the bottom.
+- Copy the code that it gives you and paste it in the VPS terminal.
+
+Your VPS should now be connected to your tailnet and see the VPS hostname in your Tailscale dashboard under the __Machines__ section.
+
+#### Restart Tailscale with the ssh flag
+```shell
+tailscale up --ssh
+```
+
+The Machines section on the dashboard should now show a little "SSH" tag next to the hostname.
+
+Make sure the computer you're using to log in to the VPS (we'll call this "local computer") is on the same tailnet because we'll be logging in via Tailscale SSH from now on.
+
+## Local computer
+
+Close the connection to the VPS and re-login, but instead of using the VPS IP address, use the __tailnet IP__ of the VPS from the Tailscale dashboard
+```shell
+ssh root@<vps-tailnet-ip>
+```
+
+Tailscale has a thing where if you're logging in as root it will make you verify your account. It resets every 12 hours by default, but you can change this in your ACL rules on the Tailscale dashboard. I personally don't really mind, but you can make that change if you want.
+
+You should now be logged in to the VPS via the tailnet IP address. Now we'll add some firewall rules.
+
+> Note: Again, make sure you are connected via the __tailnet IP address__. We will be closing the SSH ports and you may block yourself from logging in. If this does happen, before you wipe out the machine and start over, check to see if your VPS provider offers a VNC option where you can connect via a web-shell. Then you can disable the firewall rules and fix the issue.
+
+## VPS
+
+Let's set some firewall rules using [UFW](https://launchpad.net/ufw)
+
+> Note: The rules will not be applied until the end, so don't worry if you make a mistake right now.
+
+First we'll disable all incoming and outgoing traffic. We do this so by default, _everything_ is blocked and we only allow the specific traffic we need.
+```shell
+ufw default deny incoming
+```
+```shell
+ufw default deny outgoing
+```
+
+#### HTTP
+```shell
+ufw allow in 80/tcp
+```
+```shell
+ufw allow out 80/tcp
+```
+
+#### HTTPS
+```shell
+ufw allow in 443/tcp
+```
+```shell
+ufw allow out 443/tcp
+```
+
+#### DNS
+```shell
+ufw allow out 53/tcp
+ufw allow out 53/udp
+```
+
+Once we set up the Coolify LXC we'll have to add that to the rules, but for now this should be fine.
+
+And once we know everything is set up and working we'll come back and turn off SSH and set some ACL rules in our Tailscale config.
+
+#### Turn on UFW
+```shell
+ufw enable
+```
+
+You should still be connected to the VPS at this point.
+
+You can check the UFW rules by typing
+```shell
+ufw status numbered
+```
+
+If you need to remove a rule you can do
+```shell
+ufw delete <number>
+```
+
+Make sure to reload UFW after updating the rules
+```shell
+ufw reload
+```
+
+## Proxmox
+
+Now we'll log in to our Proxmox dashboard and make the LXC for our Coolify instance.
+Just FYI, I'm running Proxmox v7.4-17 on this instance. I doubt it matters much for what we're doing, but just in case.
+
+Download the Debian 12 LXC image by selecting your storage device, go to the __CT Templates__ option and clicking the __Templates__ button at the top.
+
+Choose the __Debian 12__ image and download it.
+
+Once it's done, click the __Create CT__ button at the top of the screen. I set my container up like this, but you can customize yours however you like.
+```text
+General:
+  - Name: coolify
+  - Leave as "Unprivileged"
+Template:
+  - debian-12-standard_12.7-1_amd6
+Disks:
+  - 60GB
+CPU:
+  - 4 Cores
+Memory:
+  - 6GB (6144)
+Network:
+  - DHCP
+```
+
+Don't start the container yet because we need to update the config file on the main Proxmox node to pass Tailscale stuff. For this you'll need to select your Proxmox node and open the shell. Or SSH in, whatever.
+
+#### Inside the main Proxmox node shell, edit the following file
+```shell
+nano /etc/pve/lxc/<lxc-id>.conf
+```
+
+#### Add the following to the end of the file
+```shell
+lxc.cgroup.devices.allow: c 10:200 rwm
+lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+```
+
+This will let us log in to the unprivileged container via Tailscale SSH.
+
+#### Save the file and exit the shell.
+
+#### Start the new Coolify LXC
+
+## Coolify LXC
+
+#### Log in as root
+
+#### Update the system
+```shell
+apt update && apt upgrade
+```
+
+#### Reboot
+```shell
+reboot now
+```
+
+#### Log back in
+
+#### Install the same "QOL" packages as before
+```shell
+apt install build-essential curl file git ufw zsh neovim git-core fonts-powerline
+```
+
+#### If you installed ZSH like in the command above, install oh-my-zsh now
+```shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+#### Reboot
+```shell
+reboot now
+```
+
+## Tailscale dashboard
+Click the __Add machine +__ button and generate a script for the Coolify LXC
+
+## Coolify LXC
+Paste the script in to the Coolify LXC to install Tailscale
+
+#### Start Tailscale with SSH
+```shell
+tailscale up --ssh
+```
+
+#### Test that it works by pinging the VPS with the tailnet IP
+```shell
+ping <vps-tailnet-ip>
+```
+
+#### If you got a response, try to SSH in to the VPS with the tailnet IP
+```shell
+ssh root@<vps-tailnet-ip>
+```
+
+You should now be logged in as root on the VPS via Tailscale SSH on the Coolify LXC container. Great stuff. We are doing things.
+
+## VPS
+
+#### Add the Coolify LXC to the UFW rules
+```shell
+ufw allow out to <coolify-lxc-tailnet-ip>
+```
+
+#### Reload UFW
+```shell
+ufw reload
+```
+
+## Coolify LXC
+
+Now we can finally install Coolify and get that set up
+
+#### Install Coolify
+```shell
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+```
+
+Note: It kinda hangs toward the end, but it's finished when you see
+```text
+   ____                            _         _       _   _                 _
+  / ___|___  _ __   __ _ _ __ __ _| |_ _   _| | __ _| |_(_) ___  _ __  ___| |
+ | |   / _ \| '_ \ / _` | '__/ _` | __| | | | |/ _` | __| |/ _ \| '_ \/ __| |
+ | |__| (_) | | | | (_| | | | (_| | |_| |_| | | (_| | |_| | (_) | | | \__ \_|
+  \____\___/|_| |_|\__, |_|  \__,_|\__|\__,_|_|\__,_|\__|_|\___/|_| |_|___(_)
+                   |___/
+
+
+Your instance is ready to use!
+```
+
+## Local computer (Coolify dashboard)
+
+Log in to the Coolify Dashboard by going to `http://<coolify-lxc-ip>:8000`
+
+Create an admin user and start the onboarding process.
+
+On the Server step, select __Remote Server__
+
+When it asks about SSH keys, select __No (Create one for me)__ and update the name to something like "Coolify LXC" or whatever. It doesn't really matter.
+
+Give the server a name and put in the __Tailnet IP address__ of the VPS
+
+Click __Next__ and validate the server.
+
+If it worked you should see a bunch of green checkmarks and it will install some Docker stuff on your VPS. If you get an error, log in to the VPS and disable UFW and try to verify again. Chances are the issue is something with the firewall rules. Narrow down what the problem could be and continue once you're able to verify the VPS as a server in Coolify with the firewall enabled.
+
+We've now got Coolify running locally on an LXC in a self-hosted Proxmox instance connected to a VPS via an encrypted tunnel with Tailscale. Life is good.
+
+## Cloudflare/Domain provider
+
+This step is optional, but I haven't had much luck using the auto-generated URLs provided by Coolify and this worked for me. Plus, having the domain protected by Cloudflare is something I would do anyway, win-win.
+
+Just FYI, I use [Porkbun](https://porkbun.com) for my domain provider and Cloudflare for the DNS/everything else, but you can use whatever domain provider you're comfortable with.
+
+Log in to Cloudflare and import your domain by clicking the __"+ Add a domain"__ button at the top of the Overview page
+
+Type in your domain name, leave "Quick scan..." selected and Continue
+
+Cloudflare will ask you to update your nameservers so go back to your domain provider and do that.
+
+#### Wait a bit for the nameservers to switch over
+
+Once Cloudflare is controlling your DNS, Go to the __Account Home__ page, select your domain and click the __DNS Records__ link at the top right of the page.
+
+Change the `A` record to the IP address of your VPS. __Not the tailnet IP__, just the regular VPS IP given to you by the VPS provider.
+
+At this stage I also added a sub-domain that I'll use for testing stuff out. Do this by adding a `CNAME` with whatever you want your sub-domain to be and set the value field to your domain. I'll add `blog` as the sub-domain.
+
+#### Save your settings and wait a minute.
+
+## Coolify dashboard
+
+Let's test it out. I'm going to use the template for this blog as an example. If you want to do the same for the sake of testing or if you just want a sweet new self-hosted blog on your server, the repo is [here](https://github.com/pywkt/pywkt-blog-template)
+
+On the left-hand menu, select the __Projects__ tab and click the __+ Add__ button at the top
+
+#### Give the project a name.
+Mine is called "pywkt-blog"
+
+Coolify will automatically put it in the Production environment which is fine. Just click __Production__ and click the Add New Resource button.
+
+#### Select Public Repository
+
+#### Select the VPS server
+
+Enter the URL of the repository. ([https://github.com/pywkt/pywkt-blog-template](https://github.com/pywkt/pywkt-blog-template)) and click the Check Repository button.
+
+When the options appear:
+Change the Publish Directory to `/out`
+And check the box that says __Is it a static site?__ because yes, this is a static site.
+
+#### Click Continue
+
+If you made a sub-domain in Cloudflare, set the Domains textfield to your sub-domain. eg: `https://blog.pywkt.com` 
+For whatever reason the Publish Directory value didn't save, so I'll change that to `/out` again.
+Make sure __"Is it a static site?"__ is still checked.
+Click the Save button at the top of the form.
+
+And now the part that had me stuck for wayyyyy too long.
+
+Select the __Environment Variables__ option on the left side and click the __Developer View__ button
+#### Add the following to the Production section:
+```env
+NIXPACKS_NODE_VERSION=20
+```
+Save the variable and go back to the __Normal View__
+
+Check the box that says __Build Variable__
+
+#### Save and go back to the __Configuration__ tab
+
+If everything looks good, click the __Deploy__ button at the top right of the form.
+
+The app should build and once it finishes you should be able to navigate to the sub-domain/auto-generated domain and see the site.
+
+Now that we know everything is connected and working as we would expect, let's go back on the VPS and disable SSH completely and set some ACL rules in Tailscale.
+
+## VPS
+
+Check to see that the SSH service is running
+```shell
+systemctl status ssh
+```
+
+If you see `Active: active`, then we can run the following to turn it off.
+
+#### Stop the service
+```shell
+systemctl stop ssh
+```
+#### Disable it from starting at boot
+```shell
+systemctl disable ssh
+```
+
+### Set ACL Rules in Tailscale
+
+Log in to Tailscale and go to the __Access controls__ section at the top.
+
+Change the example group to a "coolify" group
+```json
+	// Declare static groups of users beyond those in the identity service.
+	"groups": {
+		"group:coolify": ["<your-tailscale-user>"],
+	},
+```
+
+The `<your-tailscale-user>` is the "username" located under the Tailscale node on the __Machines__ page.
+
+Add a `tagOwners` section
+```json
+	"tagOwners": {
+		"tag:coolify": ["<your-tailscale-user>"],
+		"tag:admin":   ["<your-tailscale-user>"]
+	},
+```
+
+Save the config and go to the __Machines__ page
+
+Click the three dots on the row for your VPS and select __Edit ACL Tags__
+
+Select __coolify__ from the dropdown that says __Add tags__ and __Save__
+
+Do the same thing for the __coolify LXC__ node
+
+Click the three dots next to your __local machine__ and add the tag __admin__
+
+Now go back to the __Access controls__ section and inside the __"acls"__ array, update it to the following
+```json
+{"action": "accept", "src": ["tag:admin"], "dst": ["*:*"]},
+{"action": "accept", "src": ["tag:coolify"], "dst": ["tag:coolify:*"]},
+```
+
+> __Note:__ Setting these rules will only allow the users in the `admin` group to have full access to the tailnet. If you need to access other nodes that are owned by another user, you will either need to tag them appropriately or define more rules.
+
+Now add the following to the __"ssh"__ array in the __ACL__
+```json
+{
+	"action": "accept",
+	"src":    ["tag:coolify", "tag:admin"],
+	"dst":    ["tag:coolify"],
+	"users":  ["autogroup:nonroot", "root"],
+},
+```
+
+These rules will allow `admin` and `coolify` to SSH in to the VPS and Coolify LXC as `root` and any non-root user.
+
+#### Save and test the connections
+
+With the previous rules, nodes tagged `coolify` will only be able to access other nodes with the same tag.
+
+Now let's set up UFW on our Coolify LXC and block it from the rest of our local network since we've got everything already connected with Tailscale
+
+## Coolify LXC
+
+SSH in to the __Coolify LXC__ from your local machine and make sure Tailscale is running so you're using Tailscale SSH
+
+#### Install UFW
+```shell
+apt install ufw
+```
+
+#### Disable everything by default
+```shell
+ufw default deny incoming
+```
+```shell
+ufw default deny outgoing
+```
+
+Attempting to ping any IP should fail at this point
+
+#### Allow Tailscale
+```shell
+ufw allow in on tailscale0
+```
+
+```shell
+ufw allow out on tailscale0
+```
+
+You should now be allowed to ping the VPS since it's got Tailscale SSH running and it has been added to the `coolify` group in our ACL file.
+
+The LXC should also be blocked from accessing any other machines on the local network which is good too. Imagine a "worst-case-scenario" where your VPS gets compromised: The "bad actor" has control of your VPS which is able to communicate with your Coolify LXC via Tailscale, but Tailscale SSH has a 12 hour timeout before it needs to be validated again so that's a pretty good blocker right there. If they somehow managed to get past the Tailscale verification and authenticate themselves, the VPS only has access to the Coolify LXC and the Coolify LXC is cut off from everything.
+
+---
+
+Well that was a bit much, aaaaand the way it's currently running is _fiiine_, but it could be better...
+
+How about instead of building the Docker image on our VPS we set up a build server on our Proxmox instance and build everything locally and then just push it to the VPS after? Yeah, that sounds like a pretty good idea...
+
+> [How to set up a local build server on Proxmox for Coolify](/post/20250128-set-up-a-local-build-server-on-proxmox-for-coolify)
+
+
+
+
+
+

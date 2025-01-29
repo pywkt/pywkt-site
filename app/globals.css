@@ -2,20 +2,36 @@
   color-scheme: light;
   --foreground: #1d3557;
   --background: #fbf9f1;
+  --code-copy-button: #fbf9f1;
   --border-hr: #e5e1da;
   --link-hover: #e63946;
   --text-xs: 0.75rem;
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: 1.5rem;
+
+  code[data-theme*=" "],
+  code[data-theme*=" "] span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
 }
 
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --foreground: #e0fbfc;
-  --background: #293241;
-  --border-hr: #233f4a;
-  --link-hover: #ee6c4d;
+/* Catppuccin Mocha */
+:root[data-theme="dark"] {
+  --foreground: #cdd6f4;
+  --background: #1e1e2e;
+  --code-copy-button: #fbf9f1;
+  --border-hr: #363a4f;
+  --link-hover: #f0c6c6;
+
+  @media (prefers-color-scheme: dark) {
+    code[data-theme*=" "],
+    code[data-theme*=" "] span {
+      color: var(--shiki-dark);
+      background-color: var(--shiki-dark-bg);
+    }
+  }
 }
 
 h1,
@@ -41,6 +57,7 @@ h3 {
 
 h4 {
   font-size: 1rem;
+  margin-top: 1rem;
 }
 
 h5 {
@@ -66,9 +83,30 @@ a {
   }
 }
 
+p + p {
+  margin-top: 1rem;
+}
+
+h4 + h2 {
+  margin-top: 2rem;
+}
+
+p + h2,
+h4 + p {
+  margin-top: 1rem;
+}
+
+li {
+  margin-bottom: 0.6rem;
+}
+
 time {
   font-style: italic;
   font-size: 0.75rem;
+}
+
+em {
+  font-family: var(--font-dank-mono-ital);
 }
 
 .postDate {
@@ -87,4 +125,5 @@ html {
 
 body {
   padding: 0 1rem;
+  font-style: regular;
 }

@@ -1,0 +1,44 @@
+.codeBlockWrapper {
+  position: relative;
+}
+
+.codeHeader {
+  position: absolute;
+  top: 0.1rem;
+  right: 0.5rem;
+  z-index: 1;
+}
+
+.language {
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  margin-right: 0.5rem;
+}
+
+.copyButton {
+  padding: 0.1rem 0.1rem;
+  font-size: 0.75rem;
+  color: var(--code-copy-button);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.copyButton:hover {
+  opacity: 1;
+}
+
+.pre {
+  margin: 0;
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid var(--border-hr);
+}
+
+.code {
+  font-family: monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

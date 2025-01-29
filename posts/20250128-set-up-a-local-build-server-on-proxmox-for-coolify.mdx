@@ -1,0 +1,297 @@
+export const data = {
+title: "Set up a Local Build Server on Proxmox for Coolify",
+slug: "20250128-set-up-a-local-build-server-on-proxmox-for-coolify",
+author: "pywkt",
+description: "Instructions on how to set up a local Docker registry and use it as a build server in a Coolify instance hosted on Proxmox", 
+date: "2025/01/28",
+tags: ["self-hosting", "coolify", "tailscale", "docker"]
+}
+
+In the last article we set up Coolify on an LXC in Proxmox and secured everything with Tailscale.
+
+### Build Server
+
+Create a new LXC in Proxmox
+```text
+General:
+- Name: coolify-build
+- Leave as "Unprivileged"
+Template: 
+- Debian 12
+Disks: 
+- 60GB
+CPU: 
+- 4 Cores
+Memory: 
+- 8GB (8192MiB)
+Network: 
+- DHCP
+DNS: 
+- Default
+```
+
+Before starting the LXC we need to log in to the root node and add the following to the config
+
+```shell 
+nano /etc/pve/lxc/<lxc-number>.conf
+```
+
+#### Add these lines to the bottom
+```shell
+lxc.cgroup.devices.allow: c 10:200 rwm
+lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+```
+
+#### Save and exit.
+
+Start the new `coolify-build` container
+
+#### Update the system
+```shell
+apt update && apt upgrade
+```
+
+#### Install Curl
+```shell
+apt install curl
+```
+
+## Tailscale
+Log in to Tailscale and get a new script for setting up Tailscale on a linux server
+
+#### Paste the script in the new Build LXC
+
+#### Start Tailscale with SSH
+```shell
+tailscale up --ssh
+```
+
+If you followed the [previous guide](20250127-deploy-to-vps-from-coolify-on-proxmox-lxc):
+Go to the __Machines__ section in the Tailscale dashboard and add the __ACL Tag__ `coolify` to the __coolify-build__ node
+
+## Build LXC
+
+#### Create a directory on the build server to hold all the registry data
+```shell
+cd ~ && mkdir registry-data && cd registry-data
+```
+
+#### Create a docker-compose.yml file in the registry directory
+```shell
+touch docker-compose.yml
+```
+
+#### Add the following to the docker-compose.yml
+```yml
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./registry-data:/var/lib/registry
+      - ./auth:/auth
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+    restart: unless-stopped
+```
+
+Save the `docker-compose.yml` file and create an `auth` directory in the __registry__ directory
+```shell
+mkdir auth
+```
+
+Still in the __registry__ directory, generate auth credentials
+```shell
+docker run --entrypoint htpasswd httpd:2 -Bbn <registry-username> <registry-password> > auth/htpasswd
+```
+
+Change `<registry-username>` and `<registry-password>` to unique values. We'll use these to log in later.
+
+Change the permissions for the newly created `htpasswd` file
+```shell
+chmod 644 auth/htpasswd
+```
+
+Add the following to the __environment__ section of the `docker-compose.yml` 
+```yml
+REGISTRY_AUTH: htpasswd
+REGISTRY_AUTH_HTPASSWD_REALM: Registry
+REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+```
+
+Save the file and start the container. Whenever I run a new container for the first time I like to run it without the `-d` flag just so I can see what's happening and then once everything is working how I want it to I just stop the container and re-run it with the flag. So start the container
+
+```shell
+docker compose up
+```
+
+Note: Docker will automatically try to use HTTPS for connecting to the registry, but since all of this is staying on the local network I'm not going to bother with that which means we have to make a change to the server's Docker config.
+
+If you set up HTTPS you can skip the following step.
+
+Still on the Build LXC:
+#### Stop the Docker container
+```shell
+docker compose down
+```
+
+#### Open the `daemon.json` file
+```shell
+nano /etc/docker/daemon.json
+```
+
+#### Add the following
+```json
+{
+  "insecure-registries": ["<build-server-tailscale-ip>:5000"], // Add this line
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  },
+...rest of the config
+}
+```
+
+#### Save the file and restart Docker
+```shell
+systemctl restart docker
+```
+
+Open a terminal on the __Coolify LXC__ and make sure you're able to connect
+```shell
+ping <build-server-tailscale-ip> -p 5000
+```
+
+If the ping fails, double check your Tailscale ACL file and/or the UFW rules on the __Coolify LXC__
+
+#### Once you're able to connect, log in to the Docker registry
+```shell
+docker login <build-server-tailscale-ip>:5000
+```
+
+#### Enter the username/password you created earlier
+```shell
+Login Succeeded
+```
+
+#### Now SSH in to the build server and log in again
+```shell
+ssh root@<build-server-tailscale-ip>
+```
+
+```shell
+docker login <build-server-tailscale-ip>:5000
+```
+
+You will probably need to edit the `/etc/docker/daemon.json` file on the build server __and__ the VPS. Just repeat the steps above for each server.
+
+> Note: I'm not sure why this file needs to be edited on all the servers, but when I remove it my builds fail 🤷
+
+Make sure to run `systemctl restart docker` after each change to `daemon.json`
+
+## Coolify LXC
+Connect to the Coolify LXC and make sure you can SSH to the Build LXC
+```shell
+ssh root@<build-lxc-tailscale-ip>
+```
+
+If everything's good, go back in the Coolify dashboard and set up the build server
+
+## Coolify dashboard
+
+- Click the __Servers__ tab on the left menu
+- Click the __+ Add__ button at the top
+- Give the build server a name: __Build LXC__ or whatever you want
+- Put in the __Tailnet IP Address__ for the Build LXC
+- Keep the Private Key set to `localhost's key`
+- Check the box that says __Use it as a build server?__
+- Click __Continue__
+
+Once you click the __Verify__ button it should start to install a bunch of Docker stuff. Let that finish and we'll try to build something!
+
+If you followed the [last post](20250127-deploy-to-vps-from-coolify-on-proxmox-lxc) and still have the blog template you can select that, otherwise add a new project.
+
+Check the box that says __Use a Build Server?__
+
+In the __Docker Image__ textfield add
+```text
+<build-server-tailscale-ip>:5000/<app-name>
+```
+
+Make sure your __Build LXC__ docker compose is running if you stopped it earlier.
+
+#### On the Build LXC
+```shell
+cd ~/registry-data
+```
+
+```shell
+docker compose up -d
+```
+
+Save your settings, click the __Deploy__ or __Redeploy__ button at the top and watch you build-server CPU dance
+
+If everything worked you should have a successful build and all the hard work was offloaded to another LXC. This lets us keep our Coolify LXC nice and lean.
+
+Now let's set up our UFW rules on the Build LXC and call it a day
+
+## Build LXC
+
+#### Install UFW
+```shell
+apt install ufw
+```
+
+#### Disable everything by default
+```shell
+ufw default deny incoming
+```
+```shell
+ufw default deny outgoing
+```
+
+HTTPS and DNS are required to pull packages from the internet
+
+#### Allow HTTPS
+```shell
+ufw allow in on 443
+```
+```shell
+ufw allow out on 443
+```
+
+#### Allow DNS
+```shell
+ufw allow out on 53
+```
+
+#### Allow Tailscale
+```shell
+ufw allow in on tailscale0
+```
+
+```shell
+ufw allow out on tailscale0
+```
+
+#### Stop and disable SSH
+```shell
+systemctl stop ssh
+```
+```shell
+systemctl disable ssh
+```
+```shell
+systemctl stop ssh.socket
+```
+```shell
+systemctl disable ssh.socket
+```
+
+---
+
+And there you have it! Coolify running locally on a Proxmox LXC with a local build server/Docker registry and everything communicates securley over an end-to-end encrypted tunnel thanks to Tailscale.

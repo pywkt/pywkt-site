@@ -3,7 +3,7 @@ import './preflight.css';
 import './globals.css';
 import Header from '@/components/Header';
 import TagList from '@/components/TagList';
-import { dankMonoReg } from '@/config/fonts';
+import { dankMonoReg, dankMonoItal } from '@/config/fonts';
 import Footer from '@/components/Footer';
 import styles from './layouts.module.css';
 import { siteMetadata } from './siteMetadata';
@@ -31,7 +31,7 @@ export default function RootLayout({
   } = styles;
 
   return (
-    <html lang='en' className={`${dankMonoReg.className}`}>
+    <html lang='en' className={`${dankMonoReg.className} ${dankMonoItal.variable}`}>
       <head>
         <Script
           id='themeToggle'

@@ -1,14 +1,15 @@
 import fs from "node:fs/promises";
-import { compile, run } from "@mdx-js/mdx";
 import * as jsxRuntime from "react/jsx-runtime";
+import { compile, run } from "@mdx-js/mdx";
+import { Metadata } from "next";
 import remarkGfm from "remark-gfm";
+import rehypePrettyCode from "rehype-pretty-code";
 import { customComponents } from "@/config/customMDXComponents";
 import PostPage from "@/components/PostPage";
-import rehypePrettyCode from "rehype-pretty-code";
-import { postMetadata } from "./postMetadata";
-import { Metadata } from "next";
-import { getSinglePostMeta, getAllFiles } from "@/util/getPostMetadata";
 import { Post } from "@/components/AllPosts";
+import { postMetadata } from "./postMetadata";
+import { getSinglePostMeta, getAllFiles } from "@/util/getPostMetadata";
+import { MDXComponents } from "mdx/types";
 
 type MetadataProps = {
   params: { id: string; title: string; slug: string };
@@ -24,22 +25,25 @@ export async function generateMetadata({
 }: MetadataProps): Promise<Metadata> {
   const postMeta = await getSinglePostMeta(params.slug);
   const meta = postMetadata(postMeta as Post);
-
   return meta;
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const options = {
-    // theme: cookieValue === 'dark' ? 'catppuccin-macchiato' : 'material-theme',
-    theme: "material-theme",
+    grid: true,
+    theme: {
+      light: "rose-pine-moon",
+      dark: "catppuccin-mocha",
+    },
+    bypassInlineCode: false,
     defaultLang: {
       block: "javascript",
       inline: "shell",
     },
+    keepBackground: true,
     tokensMap: {
       txt: "entity.name.",
     },
-    // keepBackground: cookieValue === 'dark' ? true : true,
   };
 
   const code = String(
@@ -58,7 +62,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
   return (
     <PostPage
-      content={<Content components={customComponents} />}
+      content={<Content components={customComponents as MDXComponents} />}
       data={data as Post}
     />
   );

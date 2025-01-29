@@ -20,6 +20,10 @@
   grid-row-start: 1;
 }
 
+.tagListContainer li {
+  margin-bottom: 0;
+}
+
 .themeToggleContainer {
   width: 100%;
   display: flex;

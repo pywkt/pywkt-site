@@ -2,8 +2,8 @@
   margin-top: 1.4rem;
 }
 
-.post h1 {
-  font-size: 3rem;
+.post h2 {
+margin-top: 2rem;
 }
 
 .post p {
@@ -62,12 +62,36 @@
 
 .post pre {
   overflow-x: auto;
-  padding: 1rem 0;
+  padding: 0;
   border-radius: 6px;
 }
 
 .post pre [data-line] {
-  padding: 0 1rem;
+  padding: 1.2rem 0.75rem;
+}
+
+.post pre > code[data-language="text"] {
+  padding: 0
+}
+
+.post pre > code > span[data-line] {
+  padding: 0;
+}
+
+.post figure > pre > code > pre > code {
+  padding: 1rem;
+  min-width: 100% !important;
+  width: max-content !important;
+}
+
+.post figure > pre > code > pre > code[data-language="text"] {
+  padding: 1rem;
+  width: min-content !important;
+}
+
+.post h4 code {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px
 }
 
 .post figure {
