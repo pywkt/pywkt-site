@@ -4,7 +4,7 @@ slug: "20250127-deploy-to-vps-from-coolify-on-proxmox-lxc",
 author: "pywkt",
 description: "Step by step instructions on how to deploy Coolify on a Proxmox LXC, set up deployments to a VPS and secure everything with Tailscale and no open SSH ports.", 
 date: "2025/01/27",
-tags: ["self-hosting", "coolify", "tailscale"]
+tags: ["coolify", "proxmox", "self-hosting", "tailscale"]
 }
 
 When I first went to set up Coolify, I found it very surprising that all the guides/videos I came across only had instructions to set up the Coolify dashboard on the same server as the sites/services it'll be hosting. This seemed strange to me considering it says right on the onboarding page:
@@ -494,6 +494,11 @@ ufw allow in on tailscale0
 
 ```shell
 ufw allow out on tailscale0
+```
+
+#### Allow localhost so the Coolify dashboard can do it's thing
+```shell
+ufw allow from 127.0.0.1 to 127.0.0.1
 ```
 
 You should now be allowed to ping the VPS since it's got Tailscale SSH running and it has been added to the `coolify` group in our ACL file.

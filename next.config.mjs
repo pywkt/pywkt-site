@@ -1,12 +1,3 @@
-// /**
-//  * @type {import('next').NextConfig}
-//  */
-// const nextConfig = {
-//   output: "export",
-// };
-//
-// module.exports = nextConfig;
-
 /**
  * @typedef {import('next').NextConfig} NextConfig
  * @typedef {Array<((config: NextConfig) => NextConfig)>} NextConfigPlugins

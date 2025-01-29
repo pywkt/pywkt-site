@@ -4,7 +4,7 @@ slug: "20250128-set-up-a-local-build-server-on-proxmox-for-coolify",
 author: "pywkt",
 description: "Instructions on how to set up a local Docker registry and use it as a build server in a Coolify instance hosted on Proxmox", 
 date: "2025/01/28",
-tags: ["self-hosting", "coolify", "tailscale", "docker"]
+tags: ["coolify", "docker", "proxmox", "self-hosting", "tailscale"]
 }
 
 In the last article we set up Coolify on an LXC in Proxmox and secured everything with Tailscale.
@@ -264,6 +264,11 @@ ufw allow in on 443
 ufw allow out on 443
 ```
 
+#### Allow out on HTTP
+```shell
+ufw allow out on 80/tcp
+```
+
 #### Allow DNS
 ```shell
 ufw allow out on 53
@@ -277,6 +282,7 @@ ufw allow in on tailscale0
 ```shell
 ufw allow out on tailscale0
 ```
+
 
 #### Stop and disable SSH
 ```shell
