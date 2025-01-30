@@ -3,27 +3,29 @@
 }
 
 .post h2 {
-margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 .post p {
   margin-bottom: 1.2rem;
 }
 
-.post ul {
-  list-style-type: '- ';
+.post ul,
+.post ol {
   margin-left: 2rem;
   margin-bottom: 1rem;
+}
+
+.post ul {
+  list-style-type: '- ';
 }
 
 .post ol {
   list-style: auto;
-  margin-left: 2rem;
-  margin-bottom: 1rem;
 }
 
 .post blockquote {
-  margin: 1.6rem 0rem;
+  margin: 1.6rem 0;
   padding-left: 1rem;
   border-left: 10px ridge var(--link-hover);
 }
@@ -38,26 +40,30 @@ margin-top: 2rem;
 
 .post p code {
   border-radius: 20px;
-  padding: 0rem 0rem;
   font-size: 0.9rem;
 }
-.post figure + p {
-  margin-bottom: 0px !important;
-}
 
+.post figure + p {
+  margin-bottom: 0 !important;
+}
 
 /* Inline code */
-.post p span>code,
-.post li span>code {
-  padding: 0.1rem 0.2rem;
+.post p span > code,
+.post li span > code {
+  padding: 0.1rem 0.4rem 0.2rem;
   border-radius: 3px;
   font-size: 0.9rem;
-  background-color: #263238 !important;
 }
 
-.post p span>code span,
-.post li span>code span {
+.post p span > code span,
+.post li span > code span {
   font-style: normal !important;
+}
+
+.post h4 code {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem 0.3rem;
+  border-radius: 6px;
 }
 
 .post pre {
@@ -70,10 +76,7 @@ margin-top: 2rem;
   padding: 1.2rem 0.75rem;
 }
 
-.post pre > code[data-language="text"] {
-  padding: 0
-}
-
+.post pre > code[data-language="text"],
 .post pre > code > span[data-line] {
   padding: 0;
 }
@@ -89,11 +92,6 @@ margin-top: 2rem;
   width: min-content !important;
 }
 
-.post h4 code {
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px
-}
-
 .post figure {
   margin: 0.6rem 0 1.8rem;
 }
@@ -103,3 +101,7 @@ margin-top: 2rem;
   margin-top: 1.6rem;
   margin-bottom: 1.6rem;
 }
+
+
+
+

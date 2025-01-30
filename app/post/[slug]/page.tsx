@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import * as jsxRuntime from "react/jsx-runtime";
+import * as runtime from "react/jsx-runtime";
 import { compile, run } from "@mdx-js/mdx";
 import { Metadata } from "next";
 import remarkGfm from "remark-gfm";
@@ -8,16 +8,21 @@ import { customComponents } from "@/config/customMDXComponents";
 import PostPage from "@/components/PostPage";
 import { Post } from "@/components/AllPosts";
 import { postMetadata } from "./postMetadata";
-import { getSinglePostMeta, getAllFiles } from "@/util/getPostMetadata";
+import { getSinglePostMeta } from "@/util/getPostMetadata";
 import { MDXComponents } from "mdx/types";
+import { getValidSlugs } from "@/util/getValidSlugs";
 
 type MetadataProps = {
   params: { id: string; title: string; slug: string };
 };
 
 export async function generateStaticParams() {
-  const posts = await getAllFiles("posts");
-  return posts.map((post) => ({ slug: post.split(".")[0] }));
+  const slugs = await getValidSlugs();
+  const params = slugs.map((slug) => ({
+    slug,
+  }));
+
+  return params;
 }
 
 export async function generateMetadata({
@@ -56,7 +61,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   );
 
   const { default: Content, data } = await run(code, {
-    ...jsxRuntime,
+    ...runtime,
     Fragment: "div",
   });
 

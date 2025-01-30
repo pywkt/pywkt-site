@@ -2,7 +2,7 @@
   width: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .leftSpacerGrid {
@@ -29,26 +29,25 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
   gap: 0.4rem;
   margin-bottom: 0.4rem;
   padding-left: 1rem;
 }
 
-/* sm */
+/* Breakpoints */
 @media (min-width: 640px) {
   .pageGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .mainContentContainer {
     grid-row-start: 1;
-    grid-column: span 4 / span 4;
+    grid-column: span 4;
   }
 
   .tagListContainer {
     display: grid;
-    grid-column: span 1 / span 1;
+    grid-column: span 1;
     text-align: right;
   }
 
@@ -57,38 +56,34 @@
   }
 }
 
-/* md */
 @media (min-width: 890px) {
   .pageGrid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .mainContentContainer {
     margin: 0 auto;
     padding: 0 2rem;
-    grid-column: span 5 / span 5;
+    grid-column: span 5;
   }
 
   .tagListContainer {
-    grid-column: span 1 / span 1;
+    grid-column: span 1;
   }
 }
 
-/* lg */
 @media (min-width: 1200px) {
   .pageGrid {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(8, 1fr);
   }
 
   .leftSpacerGrid {
-    grid-column: span 1 / span 1;
-    grid-column-start: 1;
+    grid-column: 1 / span 1;
     visibility: visible;
   }
 
   .mainContentContainer {
-    grid-column: span 4 / span 4;
-    grid-column-start: 3;
+    grid-column: 3 / span 4;
     padding: 0;
   }
 
@@ -99,7 +94,7 @@
 
 @media (min-width: 1400px) {
   .mainContentContainer {
-    padding: 0;
     grid-column-start: 3;
+    padding: 0;
   }
 }

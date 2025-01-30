@@ -18,9 +18,9 @@ export default async function PostPage({
       <PostDate date={data.date} dateOnly={!Boolean(data.lastUpdated)} />
       {data.lastUpdated && <UpdatedDate date={data.lastUpdated} />}
       <article className={post}>{content}</article>
-      <hr className={commentHr}/>
-      <PostComments title={data.title}/>
-      <hr className={commentHr}/>
+      <hr className={commentHr} />
+      <PostComments title={data.title} />
+      <hr className={commentHr} />
     </section>
   );
 }

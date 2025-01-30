@@ -1,13 +1,13 @@
 export const data = {
-title: "Set up a Local Build Server on Proxmox for Coolify",
-slug: "20250128-set-up-a-local-build-server-on-proxmox-for-coolify",
+title: "Setting up a Local Build Server for Coolify on Proxmox",
+slug: "20250130-setting-up-a-local-build-server-for-coolify-on-proxmox",
 author: "pywkt",
 description: "Instructions on how to set up a local Docker registry and use it as a build server in a Coolify instance hosted on Proxmox", 
-date: "2025/01/28",
+date: "2025/01/30",
 tags: ["coolify", "docker", "proxmox", "self-hosting", "tailscale"]
 }
 
-In the last article we set up Coolify on an LXC in Proxmox and secured everything with Tailscale.
+In the last article we set up Coolify on an LXC in Proxmox and secured everything with Tailscale. Now we'll set up another LXC in Proxmox to act as our build server. Because why _wouldn't_ we?
 
 ### Build Server
 
@@ -95,6 +95,9 @@ services:
       - ./auth:/auth
     environment:
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
     restart: unless-stopped
 ```
 
@@ -113,13 +116,6 @@ Change `<registry-username>` and `<registry-password>` to unique values. We'll u
 Change the permissions for the newly created `htpasswd` file
 ```shell
 chmod 644 auth/htpasswd
-```
-
-Add the following to the __environment__ section of the `docker-compose.yml` 
-```yml
-REGISTRY_AUTH: htpasswd
-REGISTRY_AUTH_HTPASSWD_REALM: Registry
-REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
 ```
 
 Save the file and start the container. Whenever I run a new container for the first time I like to run it without the `-d` flag just so I can see what's happening and then once everything is working how I want it to I just stop the container and re-run it with the flag. So start the container
@@ -161,7 +157,7 @@ nano /etc/docker/daemon.json
 systemctl restart docker
 ```
 
-Open a terminal on the __Coolify LXC__ and make sure you're able to connect
+Open a terminal on the __Coolify LXC__ and make sure you're able to connect to the build server
 ```shell
 ping <build-server-tailscale-ip> -p 5000
 ```
@@ -207,7 +203,7 @@ If everything's good, go back in the Coolify dashboard and set up the build serv
 - Click the __+ Add__ button at the top
 - Give the build server a name: __Build LXC__ or whatever you want
 - Put in the __Tailnet IP Address__ for the Build LXC
-- Keep the Private Key set to `localhost's key`
+- Keep the Private Key set to localhost's key
 - Check the box that says __Use it as a build server?__
 - Click __Continue__
 
@@ -233,7 +229,7 @@ cd ~/registry-data
 docker compose up -d
 ```
 
-Save your settings, click the __Deploy__ or __Redeploy__ button at the top and watch you build-server CPU dance
+Save your settings, click the __Deploy__ or __Redeploy__ button at the top and watch your build-server CPU dance
 
 If everything worked you should have a successful build and all the hard work was offloaded to another LXC. This lets us keep our Coolify LXC nice and lean.
 
@@ -254,7 +250,7 @@ ufw default deny incoming
 ufw default deny outgoing
 ```
 
-HTTPS and DNS are required to pull packages from the internet
+HTTPS and DNS are required to pull packages from the internet. This could probably be fine-tuned if you know exactly where all your packages are coming from, but for now this is fine.
 
 #### Allow HTTPS
 ```shell

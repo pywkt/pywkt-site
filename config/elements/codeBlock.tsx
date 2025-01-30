@@ -1,5 +1,6 @@
-import styles from "./codeBlock.module.css";
-import CopyButton from "./CopyButton";
+// elements/codeBlock.tsx
+import styles from './codeBlock.module.css';
+import CopyButton from './CopyButton';
 
 type CodeBlockProps = {
   children: React.ReactNode;
@@ -7,27 +8,27 @@ type CodeBlockProps = {
 };
 
 const extractTextContent = (node: React.ReactNode): string => {
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return String(node);
-  if (!node) return "";
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return String(node);
+  if (!node) return '';
 
   if (Array.isArray(node)) {
-    return node.map(extractTextContent).join("");
+    return node.map(extractTextContent).join('');
   }
 
-  if (typeof node === "object" && "props" in node) {
+  if (typeof node === 'object' && 'props' in node) {
     const { props } = node as any;
     if (props.children) {
       return extractTextContent(props.children);
     }
   }
 
-  return "";
+  return '';
 };
 
 export const codeBlock = {
   figure: ({ children, className }: CodeBlockProps) => {
-    const language = className ? className.replace("language-", "") : "";
+    const language = className ? className.replace('language-', '') : '';
     const textContent = extractTextContent(children);
 
     return (
@@ -37,7 +38,7 @@ export const codeBlock = {
           <CopyButton text={textContent} />
         </div>
         <pre className={styles.pre}>
-          <code className={`${styles.code} ${className || ""}`}>
+          <code className={`${styles.code} ${className || ''}`}>
             {children}
           </code>
         </pre>
