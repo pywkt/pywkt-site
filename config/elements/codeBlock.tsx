@@ -1,4 +1,3 @@
-// elements/codeBlock.tsx
 import styles from './codeBlock.module.css';
 import CopyButton from './CopyButton';
 

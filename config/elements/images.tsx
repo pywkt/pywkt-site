@@ -1,10 +1,17 @@
 "use client";
 import Image from "next/image";
 
-const imageLoader = ({ src, width, quality }: any) => {
-  return `https://${process.env.NEXT_PUBLIC_CF_IMG}${src}?w=${width}&q=${
-    quality || 75
-  }`;
+const imageLoader = ({
+  src,
+  width,
+  quality,
+}: {
+  src: string;
+  width: number;
+  quality?: number;
+}) => {
+  return `https://${process.env.NEXT_PUBLIC_CF_IMG}${src}?w=${width}&q=${quality || 75
+    }`;
 };
 
 export const images = {
