@@ -1,0 +1,71 @@
+export const data = {
+title: "Setting the time on a Debian VPS",
+slug: "20250415-setting-time-on-debian-vps",
+author: "pywkt",
+description: "Quick one-liner to set the time on Debian", 
+date: "2025/04/15",
+tags: ["linux", "debian"]
+}
+
+I have a VPS running Debian 11 and it serves a web app that uses Clerk for authentication. I kept running in to an issue where I couldn't log in properly and saw this in the logs:
+
+```bash
+2025-04-15T10:29:39.979504379Z Clerk: unable to resolve handshake:  [Error: JWT cannot be used prior to not before date claim (nbf). Not before date: Tue, 15 Apr 2025 14:23:16 GMT; Current date: Tue, 15 Apr 2025 10:29:39 GMT;] {
+2025-04-15T10:29:39.979535958Z   reason: 'token-not-active-yet',
+2025-04-15T10:29:39.979539899Z   action: undefined
+2025-04-15T10:29:39.979543109Z }
+```
+
+I tried _everything_ and for the life of me could not get the VPS time to sync. 
+
+This isn't the cleanest option and I'd really only recommend it if nothing else works out for you.
+
+```
+sudo date -s "$(curl -s --head http://google.com | grep ^Date: | sed 's/Date: //g')"
+```
+
+### curl -s --head http://google.com
+
+- `curl`: A tool to transfer data from or to a server
+
+- `-s`: Silent mode (doesn't show progress or error messages)
+
+- `--head`: Fetch only the HTTP headers, not the content of the webpage.
+
+This sends a HEAD request to Google's server, which responds with HTTP headers that include the current date and time
+
+
+### grep ^Date:
+
+- `grep`: A command to search for patterns in text
+
+- `^Date:`: Searches for lines that begin with "Date:".
+
+This extracts only the header line that contains the timestamp from Google's servers
+
+
+### sed 's/Date: //g'
+
+- `sed`: Stream editor for filtering and transforming text
+
+- `'s/Date: //g'`: A substitution command that replaces "Date: " with nothing, effectively removing it.
+
+This cleans up the output, leaving only the actual date and time string
+
+
+### $()
+
+- `Command substitution` - executes the commands inside and replaces itself with their output.
+
+The result of the curl+grep+sed commands becomes the argument for the date command
+
+
+### sudo date -s
+
+- `sudo`: Execute command as superuser
+
+- `date`: Command to display or set the system date and time
+
+- `-s`: Set system time to the string provided as an argument
+
+I have a feeling there will be some "slippage" on this server and I'll have to re-do this eventually, but i guess only _time_ will tell...

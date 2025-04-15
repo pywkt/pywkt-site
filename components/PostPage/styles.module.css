@@ -6,6 +6,10 @@
   margin-top: 2rem;
 }
 
+.post p ~ h3 {
+  margin-bottom: 0.6rem;
+}
+
 .post p {
   margin-bottom: 1.2rem;
 }
