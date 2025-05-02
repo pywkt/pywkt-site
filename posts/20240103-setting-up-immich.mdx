@@ -357,30 +357,30 @@ If you didn't start the container with the `-d` flag, you should see some logs i
 
 Before setting up GPU:
 ```shell
-immich_machine_learning  | [05/02/25 21:20:43] INFO     Application startup complete.
-immich_machine_learning  | [05/02/25 21:20:50] INFO     Loading detection model 'buffalo_l' to memory
-immich_machine_learning  | [05/02/25 21:20:50] INFO     Setting execution providers to
-immich_machine_learning  |                              ['CPUExecutionProvider'], in descending order of
-immich_machine_learning  |                              preference
-immich_machine_learning  | [05/02/25 21:20:50] INFO     Loading recognition model 'buffalo_l' to memory
-immich_machine_learning  | [05/02/25 21:20:50] INFO     Setting execution providers to
-immich_machine_learning  |                              ['CPUExecutionProvider'], in descending order of
-immich_machine_learning  |                              preference
+[05/02/25 21:20:43] INFO     Application startup complete.
+[05/02/25 21:20:50] INFO     Loading detection model 'buffalo_l' to memory
+[05/02/25 21:20:50] INFO     Setting execution providers to
+                             ['CPUExecutionProvider'], in descending order of
+                             preference
+[05/02/25 21:20:50] INFO     Loading recognition model 'buffalo_l' to memory
+[05/02/25 21:20:50] INFO     Setting execution providers to
+                             ['CPUExecutionProvider'], in descending order of
+                             preference
 ```
 
 Note the `CPUExecutionProvider`, that's not what we want.
 
 After setting up the GPU you should see something like this:
 ```shell
-immich_machine_learning  | [05/02/25 21:23:54] INFO     Application startup complete.
-immich_machine_learning  | [05/02/25 21:24:39] INFO     Loading detection model 'buffalo_l' to memory
-immich_machine_learning  | [05/02/25 21:24:39] INFO     Setting execution providers to
-immich_machine_learning  |                              ['CUDAExecutionProvider', 'CPUExecutionProvider'],
-immich_machine_learning  |                              in descending order of preference
-immich_machine_learning  | [05/02/25 21:24:40] INFO     Loading recognition model 'buffalo_l' to memory
-immich_machine_learning  | [05/02/25 21:24:40] INFO     Setting execution providers to
-immich_machine_learning  |                              ['CUDAExecutionProvider', 'CPUExecutionProvider'],
-immich_machine_learning  |                              in descending order of preference
+[05/02/25 21:23:54] INFO     Application startup complete.
+[05/02/25 21:24:39] INFO     Loading detection model 'buffalo_l' to memory
+[05/02/25 21:24:39] INFO     Setting execution providers to
+                             ['CUDAExecutionProvider', 'CPUExecutionProvider'],
+                             in descending order of preference
+[05/02/25 21:24:40] INFO     Loading recognition model 'buffalo_l' to memory
+[05/02/25 21:24:40] INFO     Setting execution providers to
+                             ['CUDAExecutionProvider', 'CPUExecutionProvider'],
+                             in descending order of preference
 ```
 
 Now we can see that the `CUDAExecutionProvider` is first and it will fallback to the CPU if needed.
