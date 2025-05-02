@@ -5,7 +5,6 @@ import { Post } from "../AllPosts";
 
 export default function ListPost({ post }: { post: Post }) {
   const { allPostsList, listPostTags } = styles;
-  console.log('post:', post)
 
   return (
     <section className={allPostsList}>
