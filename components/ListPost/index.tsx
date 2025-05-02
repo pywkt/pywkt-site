@@ -5,6 +5,7 @@ import { Post } from "../AllPosts";
 
 export default function ListPost({ post }: { post: Post }) {
   const { allPostsList, listPostTags } = styles;
+  console.log('post:', post)
 
   return (
     <section className={allPostsList}>
@@ -12,6 +13,7 @@ export default function ListPost({ post }: { post: Post }) {
         <Link href={`/post/${post.slug}`}>{post.title}</Link>
       </h1>
       <PostDate date={post.date} dateOnly />
+      {post.lastUpdated && <PostDate date={post.lastUpdated} dateOnly updated />}
       <p>{post.description}</p>
       {post.tags.map((tag) => (
         <span key={tag} className={listPostTags}>

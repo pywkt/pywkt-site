@@ -4,9 +4,11 @@ import { format } from "date-fns";
 export default function PostDate({
   date,
   dateOnly,
+  updated
 }: {
   date: string;
   dateOnly?: boolean;
+    updated?: boolean;
 }) {
   if (!date) return;
   const isoDate = new Date(date).toISOString();
@@ -15,6 +17,7 @@ export default function PostDate({
   return (
     <div className="postDate">
       {!dateOnly && <span>Posted: </span>}
+      {updated && <span>Updated: </span>}
       <time
         className={dankMonoItal.className}
         dateTime={isoDate}

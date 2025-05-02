@@ -4,12 +4,23 @@ slug: "20240103-setting-up-immich",
 author: "pywkt",
 description: "Step by step instructions on how to get up and running with Immich on a Proxmox VM. I'll also set up machine learning to be offloaded to another machine and use Intel Quicksync for video transcoding.",
 date: "2024/01/03",
-lastUpdated: "2024/05/14",
+lastUpdated: "2025/05/02",
 tags: ["proxmox", "immich", "photos", "ubuntu"]
 }
 
 Immich is probably the best self hosted and local way to manage, store and view your photos. I've been using it for quite a while now to backup photos from my phone, but in the past I had the NUC doing all the heavy-lifting. In this guide I'm going to pass that off to a better equipped machine and also pass through Quicksync for transcoding videos. I'm also going to set up a dataset in TrueNAS to store all the photos. And of course I'll be doing all of this in Proxmox.
 
+**Update 2025/05/02**
+
+Welp, here we are again, re-installing Immich because of breaking changes. I pretty much only use Immich a few times a year which means I don't regularly update my Docker image. Today I logged in and saw that I was on `1.111.0` and `1.132.3` is the latest version. Naturally I'm like, "Cool, just a few minor releases, may as well update." So I run a `sudo docker compose pull`, update and start the containers. *Surprise* ...broken.
+
+To be fair, it has been almost a year since I last updated, but still, this is a bit ridiculous. But whatever.
+
+I'm going to attempt to back up/restore my data, but I'm not 100% it's going to work out, but we'll see...
+
+I was able to get my original/outdated version running by removing the existing images and setting the version variable in the `.env`.
+
+The rest of the guide has been updated with instructions for installing the latest release of Immich as of May 02, 2025.
 
 ---
 
@@ -18,11 +29,9 @@ Immich is probably the best self hosted and local way to manage, store and view 
 Normally I would prefer to use an LXC instead of a full VM, but Immich suggests using Docker and I don't feel like
 setting up each service one by one, so that means I'll be doing this in a VM. I really don't like running Docker in an LXC.
 
-
-
 #### Create a new VM in Proxmox [<sup>(ref)</sup>](/post/20240514-creating-a-vm-in-proxmox)
 
-I'm using Ubuntu 22.04, 4 cores, 4GB of ram and 24GB HDD.
+I'm using Ubuntu 24.04, 4 cores, 4GB of ram and 100GB HDD. Yes, 100GB is overkill, but I've been screwed too many times by this damn app/docker/logs/etc. Not messing around on this one.
 
 Once that's up and running go through the install process. When it asks if you want any packages pre installed, don't select any, just skip through.
 
@@ -213,6 +222,8 @@ Install some hardware packages
 sudo apt install --install-recommends linux-generic-hwe-22.04
 ```
 
+Update: change `22.04` to the version of your Ubuntu server if you're not on `22.04`
+
 Download/install the Intel Compute-Runtime stuff
 Follow the steps on this page.
 ```bash
@@ -232,33 +243,31 @@ Once you're back in the VM, type
 
 You should see something like `renderD128` listed now.
 
-Go in to the Immich folder with the config files
+Download the `hwaccel.transcoding` file to the directory with the `docker-compose.yml`
+
 ```bash
-cd ~/immich-app
+wget https://github.com/immich-app/immich/releases/latest/download/hwaccel.transcoding.yml
 ```
 
-Edit the `hwaccel` file
+Enable the hardware acceleration in the docker-compose file
+```yml
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+     extends:
+       file: hwaccel.transcoding.yml
+       service: quicksync # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+```
+
+Start Immich with Docker compose
 ```bash
-nvim hwaccel.yml
+sudo docker compose up
 ```
 
-Uncomment the Intel lines in `hwaccel.yml` to pass the folder to the container.
-```yml
-services:  
- hwaccel:  
-   devices:  
-     - /dev/dri:/dev/dri  # If using Intel QuickSync or VAAPI
-```
-
-Enable the `hwaccel` file in the docker-compose file
-```yml
-immich-microservices:  
-   container_name: immich_microservices  
-   image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}  
-   extends:  
-     file: hwaccel.yml  
-     service: hwaccel  
-   command: [ "start.sh", "microservices" ]
+Once everything is up and running and there are no errors, you can stop the container and run it with
+```bash
+sudo docker compose up -d
 ```
 
 ---
@@ -270,13 +279,23 @@ http://192.168.X.X:2283
 
 ### Remote Machine Learning
 
-The Intel NUC is a pretty great server, but I'm planning on throwing a bunch of photos in here and I want to use Immich's facial recognition features. This can really bog down the NUC so I'm going to offload this work to another machine I have in the house that I mainly use for AI/ML/LLM stuff. The Following steps will be done on that computer, which is also running Ubuntu 22.04, but the full desktop version with an RTX 3060 Ti graphics card.
+The Intel NUC is a pretty great server, but I'm planning on throwing a bunch of photos in here and I want to use Immich's facial recognition features. This can really bog down the NUC so I'm going to offload this work to another machine I have in the house that I mainly use for AI/ML/LLM stuff. The Following steps will be done on that computer, which is running Ubuntu 22.04, but the full desktop version with an RTX 3060 graphics card.
+
+
+> Note: Since I'm using an NVIDIA card I'm going to use the `cuda` tag for the image, you may need to replace that with the one that matches your setup.
+
+Make sure you have the NVIDIA Container Toolkit installed. Just follow the guide here: [https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 This computer didn't already have Docker installed so I followed the steps above for installing Docker/Docker Compose.
 
 Create a folder for the Docker Compose file
 ```bash
 mkdir -p ~/immich-ml && cd ~/immich-ml
+```
+
+Download the `hwaccel.ml.yml` file from the repo
+```shell
+wget https://github.com/immich-app/immich/releases/latest/download/hwaccel.ml.yml
 ```
 
 Create the compose file
@@ -291,12 +310,17 @@ nvim docker-compose.yml
 
 Add the Following
 ```yml
-version: '3.8'
+name: immich_remote_ml
 
 services:
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release-cuda}
+    extends:
+      file: hwaccel.ml.yml
+      service: cuda # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
     restart: always
@@ -325,19 +349,49 @@ http://192.168.X.X:3003
 
 Save the settings.
 
+> I'll be testing that the GPU is working by running the Face Detection job, so I uploaded a handful of photos with people in them.
+
+Navigate to the Jobs section of the Administrator Settings and run the Face Detection.
+
+If you didn't start the container with the `-d` flag, you should see some logs in your `immich_machine_learning` container.
+
+Before setting up GPU:
+```shell
+immich_machine_learning  | [05/02/25 21:20:43] INFO     Application startup complete.
+immich_machine_learning  | [05/02/25 21:20:50] INFO     Loading detection model 'buffalo_l' to memory
+immich_machine_learning  | [05/02/25 21:20:50] INFO     Setting execution providers to
+immich_machine_learning  |                              ['CPUExecutionProvider'], in descending order of
+immich_machine_learning  |                              preference
+immich_machine_learning  | [05/02/25 21:20:50] INFO     Loading recognition model 'buffalo_l' to memory
+immich_machine_learning  | [05/02/25 21:20:50] INFO     Setting execution providers to
+immich_machine_learning  |                              ['CPUExecutionProvider'], in descending order of
+immich_machine_learning  |                              preference
+```
+
+Note the `CPUExecutionProvider`, that's not what we want.
+
+After setting up the GPU you should see something like this:
+```shell
+immich_machine_learning  | [05/02/25 21:23:54] INFO     Application startup complete.
+immich_machine_learning  | [05/02/25 21:24:39] INFO     Loading detection model 'buffalo_l' to memory
+immich_machine_learning  | [05/02/25 21:24:39] INFO     Setting execution providers to
+immich_machine_learning  |                              ['CUDAExecutionProvider', 'CPUExecutionProvider'],
+immich_machine_learning  |                              in descending order of preference
+immich_machine_learning  | [05/02/25 21:24:40] INFO     Loading recognition model 'buffalo_l' to memory
+immich_machine_learning  | [05/02/25 21:24:40] INFO     Setting execution providers to
+immich_machine_learning  |                              ['CUDAExecutionProvider', 'CPUExecutionProvider'],
+immich_machine_learning  |                              in descending order of preference
+```
+
+Now we can see that the `CUDAExecutionProvider` is first and it will fallback to the CPU if needed.
+A+++++
+
 ---
 
 In the past I've run in to issues where the Immich logs take up so much space it fills up the VM storage. So I like to set the Log Level to either Error or Fatal once I'm confident everything is working as it should.
 
 And that's that. We've got Immich up and running with all the machine learning stuff offloaded to a computer that can handle it and Quicksync ready to transcode all those stupid hevc (or whatever) files from people with iPhones. Even if you're the only one using it, I still suggest making yourself a new account that isn't the admin account. Keep the admin account just for admin stuff.
 
+---
 
-
-
-
-
-
-
-
-
-
+I was originally planning on trying to restore my previous albums, but at this point I feel like I'll just re-upload everything and deal with it. Sucks, but hey, that's Immich for ya'. Maybe one day they'll get on a regular versioning system so you don't have to read release notes for every release. Seriously, I was something like, 20 releases behind, that's a lot, but they're putting out around 3-4 releases a month. Am I supposed to go through and read the changelogs for every single one? Today I just saw that the latest was still on the same major version I was running so I updated. Really shouldn't have to go through all this every single time...
